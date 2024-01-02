@@ -1,34 +1,35 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TermProjectBackend.Models;
 using TermProjectBackend.Models.Dto;
 using TermProjectBackend.Source.Svc;
 using System.Net;
+using TermProjectBackend.Models;
 
-namespace se4458_midterm.Controllers
+namespace TermProjectBackend.Controllers
 {
     [Route("api/Login")]
     [ApiController]
-
-    public class LoginController : Controller
+    public class LoginController : ControllerBase
     {
-        private IUserService _userService;
-        protected APIResponse _response;
+        private readonly IUserService _userService;
+        private readonly APIResponse _response;
+
         public LoginController(IUserService userService)
         {
             _userService = userService;
-            _response = new();
+            _response = new APIResponse();
         }
 
         [HttpPost("login")]
-        public ActionResult Login([FromBody] LoginRequestDTO loginRequestDTO)
+        public ActionResult<APIResponse> Login([FromBody] LoginRequestDTO loginRequestDTO)
         {
             var loginResponse = _userService.Login(loginRequestDTO);
-            if(loginResponse.APIUser == null || string.IsNullOrEmpty(loginResponse.Token))
+
+            if (loginResponse.APIUser == null || string.IsNullOrEmpty(loginResponse.Token))
             {
                 _response.StatusCode = HttpStatusCode.BadRequest;
                 _response.IsSuccess = false;
                 _response.Status = "Fail";
-                _response.ErrorMessage = "Username or password is invalid";
+                _response.ErrorMessage = "Invalid username or password.";
                 return BadRequest(_response);
             }
 
@@ -37,9 +38,5 @@ namespace se4458_midterm.Controllers
             _response.Result = loginResponse;
             return Ok(_response);
         }
-
-
-
-
     }
 }

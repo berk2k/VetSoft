@@ -7,6 +7,8 @@ namespace TermProjectBackend.Source.Svc
     {
         bool IsUserUnique(string userName);
 
+        public int getUserId(User user);
+
         public LoginResponseDTO Login(LoginRequestDTO loginReguestDTO);
 
         public User Register(RegisterationRequestDTO reqisterationRequestDTO);

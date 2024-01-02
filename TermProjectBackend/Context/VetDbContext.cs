@@ -12,5 +12,6 @@ namespace TermProjectBackend.Context
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Pet> Pets { get; set; }
     }
 }

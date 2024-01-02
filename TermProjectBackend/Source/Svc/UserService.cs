@@ -20,6 +20,11 @@ namespace TermProjectBackend.Source.Svc
             
         }
 
+        public int getUserId(User user)
+        {
+            return user.Id;
+        }
+
         public bool IsUserUnique(string userName)
         {
             var user  = _vetDb.Users.FirstOrDefault(u => u.UserName == userName);
@@ -53,6 +58,7 @@ namespace TermProjectBackend.Source.Svc
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
+                    new Claim("UserId", user.Id.ToString()),
                     new Claim(ClaimTypes.Name,user.Id.ToString()),
                     new Claim(ClaimTypes.Role,user.Role)
                 }),
@@ -66,6 +72,7 @@ namespace TermProjectBackend.Source.Svc
             {
                 Token = tokenHandler.WriteToken(token),
                 APIUser = user,
+                UserId = user.Id
             };
 
             return loginResponseDTO;
