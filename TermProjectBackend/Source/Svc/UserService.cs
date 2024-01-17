@@ -25,6 +25,24 @@ namespace TermProjectBackend.Source.Svc
             return user.Id;
         }
 
+        public User GetUserInformationById(int id)
+        {
+            // Assuming User has an Id property
+            User retrievedUser = _vetDb.Users.Find(id);
+
+            // You can modify the logic based on your actual data model
+            if (retrievedUser == null)
+            {
+                // Handle the case where the user is not found
+                throw new InvalidOperationException($"User with ID {id} not found.");
+            }
+
+            // Optionally, you can exclude sensitive information before returning the user
+            // retrievedUser.SensitiveProperty = null;
+
+            return retrievedUser;
+        }
+
         public bool IsUserUnique(string userName)
         {
             var user  = _vetDb.Users.FirstOrDefault(u => u.UserName == userName);

@@ -13,5 +13,7 @@ namespace TermProjectBackend.Source.Svc
 
         public User Register(RegisterationRequestDTO reqisterationRequestDTO);
 
+        public User GetUserInformationById(int id);
+
     }
 }
