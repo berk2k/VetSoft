@@ -15,6 +15,22 @@ namespace TermProjectBackend.Source.Svc
             
         }
 
+        public GetPetDTO GetPetInformationById(int ownerId)
+        {
+            GetPetDTO petDTO = _vetDb.Pets
+                .Where(p => p.OwnerID == ownerId)
+                .Select(p => new GetPetDTO
+                {
+                    OwnerId = p.OwnerID,
+                    Name = p.Name,
+                    Species = p.Species,
+                    Age = p.Age
+                })
+                .FirstOrDefault();
+
+            return petDTO;
+        }
+
         public Pet AddPet(AddPetRequestDTO addPetRequestDTO/*,int id*/)
         {
             Pet pet = new Pet()

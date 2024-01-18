@@ -7,5 +7,7 @@ namespace TermProjectBackend.Source.Svc
     {
         bool IsPetUnique(String name);
         public Pet AddPet(AddPetRequestDTO addPetRequestDTO/*,int id*/);
+
+        public GetPetDTO GetPetInformationById(int id);
     }
 }
