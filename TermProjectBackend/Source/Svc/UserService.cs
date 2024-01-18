@@ -115,5 +115,32 @@ namespace TermProjectBackend.Source.Svc
             return user;
 
         }
+
+        public void DeleteAccount(int id)
+        {
+            // Assuming User has an Id property
+            User userToDelete = _vetDb.Users.Find(id);
+
+            if (userToDelete == null)
+            {
+                // Handle the case where the user is not found
+                throw new InvalidOperationException($"User with ID {id} not found.");
+            }
+
+            // Delete associated pets
+            var userPets = _vetDb.Pets.Where(p => p.OwnerID == id).ToList();
+            _vetDb.Pets.RemoveRange(userPets);
+
+            // Delete associated appointments
+            var userAppointments = _vetDb.Appointments.Where(a => a.ClientID == id).ToList();
+            _vetDb.Appointments.RemoveRange(userAppointments);
+
+            // Delete the user
+            _vetDb.Users.Remove(userToDelete);
+
+            // Save changes to the database
+            _vetDb.SaveChanges();
+        }
+
     }
 }

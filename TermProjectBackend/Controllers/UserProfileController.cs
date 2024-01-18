@@ -67,5 +67,27 @@ namespace TermProjectBackend.Controllers
                 });
             }
         }
+
+        [HttpPost("Delete")]
+        public ActionResult DeleteCustomer([FromBody] int id)
+        {
+            try
+            {
+                // Assuming userService is an instance of your UserService class
+                _userService.DeleteAccount(id);
+                return Ok(new { Message = "Customer deleted successfully." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Handle the case where the user is not found
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(500, new { Message = "An error occurred while deleting the customer." });
+            }
+        }
+
     }
 }

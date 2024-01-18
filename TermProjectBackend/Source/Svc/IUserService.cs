@@ -15,5 +15,7 @@ namespace TermProjectBackend.Source.Svc
 
         public User GetUserInformationById(int id);
 
+        public void DeleteAccount(int id);
+
     }
 }
