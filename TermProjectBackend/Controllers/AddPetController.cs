@@ -20,7 +20,7 @@ namespace TermProjectBackend.Controllers
         }
 
         [HttpPost("Add")]
-        [Authorize]
+       // [Authorize]
         public ActionResult AddPet([FromBody] AddPetRequestDTO addPetRequestDTO)
         {
             // Check if pet already exists
@@ -37,7 +37,7 @@ namespace TermProjectBackend.Controllers
             }
 
             // Get user ID from the authenticated user claims
-            var userId = User.FindFirst("UserId")?.Value;  // Use "UserId" as the claim type
+         /*   var userId = User.FindFirst("UserId")?.Value;  // Use "UserId" as the claim type
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized(new APIResponse
@@ -60,10 +60,10 @@ namespace TermProjectBackend.Controllers
                     Status = "Fail",
                     ErrorMessage = "Invalid user ID format"
                 });
-            }
+            }*/
 
             // Add pet with the obtained user ID
-            var pet = _petService.AddPet(addPetRequestDTO, parsedUserId);
+            var pet = _petService.AddPet(addPetRequestDTO /*parsedUserId*/);
 
             if (pet == null)
             {

@@ -15,11 +15,12 @@ namespace TermProjectBackend.Source.Svc
             
         }
 
-        public Pet AddPet(AddPetRequestDTO addPetRequestDTO,int id)
+        public Pet AddPet(AddPetRequestDTO addPetRequestDTO/*,int id*/)
         {
             Pet pet = new Pet()
             {
-                OwnerID = id,
+                //OwnerID = id,
+                OwnerID = addPetRequestDTO.id,
                 Name = addPetRequestDTO.Name,
                 Species = addPetRequestDTO.Species,
                 Breed = addPetRequestDTO.Breed,

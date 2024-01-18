@@ -20,10 +20,10 @@ namespace TermProjectBackend.Controllers
         }
 
         [HttpPost("BookAppointment")]
-        [Authorize]
+      //  [Authorize]
         public ActionResult BookAppointment([FromBody] AppointmentDTO appointmentDTO)
         {
-            var userId = User.FindFirst("UserId")?.Value;
+        /*    var userId = User.FindFirst("UserId")?.Value;
 
             if (string.IsNullOrEmpty(userId))
             {
@@ -46,9 +46,9 @@ namespace TermProjectBackend.Controllers
                     Status = "Fail",
                     ErrorMessage = "Invalid user ID format"
                 });
-            }
+            }*/
 
-            var appointment = _appointmentService.BookAppointment(appointmentDTO, parsedUserId);
+            var appointment = _appointmentService.BookAppointment(appointmentDTO,appointmentDTO.Id);
 
             if (appointment == null)
             {

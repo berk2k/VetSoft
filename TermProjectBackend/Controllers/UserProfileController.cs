@@ -21,11 +21,11 @@ namespace TermProjectBackend.Controllers
         }
 
         [HttpGet]
-        [Authorize]
-        public ActionResult<UserProfileDTO> GetUserInfo()
+    //    [Authorize]
+        public ActionResult<UserProfileDTO> GetUserInfo(int id)
         {
 
-            var userId = User.FindFirst("UserId")?.Value;
+        /*    var userId = User.FindFirst("UserId")?.Value;
 
             if (!int.TryParse(userId, out int parsedUserId))
             {
@@ -37,16 +37,17 @@ namespace TermProjectBackend.Controllers
                     Status = "Fail",
                     ErrorMessage = "Invalid user ID format"
                 });
-            }
+            }*/
 
             // Retrieve user information based on the ID
             try
             {
-                User user = _userService.GetUserInformationById(parsedUserId);
+                User user = _userService.GetUserInformationById(id);
 
                 // Map the User entity to UserProfileDTO
                 var userProfileDTO = new UserProfileDTO
                 {
+                    Id = id,
                     UserName = user.UserName,
                     Name = user.Name
                 };
