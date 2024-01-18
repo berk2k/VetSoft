@@ -69,12 +69,12 @@ namespace TermProjectBackend.Controllers
         }
 
         [HttpPost("Delete")]
-        public ActionResult DeleteCustomer([FromBody] int id)
+        public ActionResult DeleteCustomer([FromBody] DeletePetRequestDTO deletePetRequestDTO)
         {
             try
             {
                 // Assuming userService is an instance of your UserService class
-                _userService.DeleteAccount(id);
+                _userService.DeleteAccount(deletePetRequestDTO.id);
                 return Ok(new { Message = "Customer deleted successfully." });
             }
             catch (InvalidOperationException ex)
