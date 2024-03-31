@@ -18,6 +18,12 @@ builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddScoped<LoginController>();
 builder.Services.AddScoped<AddPetController>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+builder.Services.AddScoped<IVetStaffService,VetStaffService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IItemService, ItemService>();
+builder.Services.AddScoped<IVaccinationService, VaccinationService>();
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

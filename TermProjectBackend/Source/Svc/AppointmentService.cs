@@ -1,5 +1,6 @@
 ﻿using TermProjectBackend.Context;
 using TermProjectBackend.Models;
+using TermProjectBackend.Models.Dto;
 
 namespace TermProjectBackend.Source.Svc
 {
@@ -46,10 +47,10 @@ namespace TermProjectBackend.Source.Svc
             return _vetDb.Appointments.FirstOrDefault(a => a.AppointmentId == appointmentId);
         }
 
-        public void RemoveAppointment(Appointment appointment)
+        public void RemoveAppointment(int id)
         {
             // Check if the appointment exists in the database
-            var existingAppointment = _vetDb.Appointments.FirstOrDefault(a => a.AppointmentId == appointment.AppointmentId);
+            var existingAppointment = _vetDb.Appointments.FirstOrDefault(a => a.AppointmentId == id);
 
             if (existingAppointment != null)
             {
@@ -64,7 +65,17 @@ namespace TermProjectBackend.Source.Svc
             }
         }
 
-        
+        public void UpdateAppointment(ManageAppointmentDTO appointment)
+        {
+            var appointmentToUpdate = _vetDb.Appointments.FirstOrDefault(i => i.AppointmentId == appointment.Id);
 
+            if (appointmentToUpdate != null)
+            {
+                
+                appointmentToUpdate.AppointmentDateTime = appointment.AppointmentDateTime;
+
+                _vetDb.SaveChanges();
+            }
+        }
     }
 }

@@ -9,6 +9,7 @@ namespace TermProjectBackend.Source.Svc
 
         public int getUserId(User user);
 
+        public int getUserIdByName(string userName);
         public LoginResponseDTO Login(LoginRequestDTO loginReguestDTO);
 
         public User Register(RegisterationRequestDTO reqisterationRequestDTO);
@@ -16,6 +17,8 @@ namespace TermProjectBackend.Source.Svc
         public User GetUserInformationById(int id);
 
         public void DeleteAccount(int id);
+
+        public List<string> GetAllUserNames();
 
     }
 }

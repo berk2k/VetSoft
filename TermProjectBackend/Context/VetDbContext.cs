@@ -15,5 +15,13 @@ namespace TermProjectBackend.Context
         public DbSet<Pet> Pets { get; set; }
 
         public DbSet<Appointment> Appointments { get; set; }
+
+        public DbSet<VetStaff> VetStaff { get; set;}
+
+        public DbSet<Notification> Notification { get; set; }  
+
+        public DbSet<Item> Items { get; set; }
+
+        public DbSet<VaccinationRecord> VaccinationRecord {  get; set; } 
     }
 }

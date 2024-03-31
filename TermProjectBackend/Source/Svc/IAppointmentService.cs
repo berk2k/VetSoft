@@ -1,4 +1,5 @@
 ﻿using TermProjectBackend.Models;
+using TermProjectBackend.Models.Dto;
 
 namespace TermProjectBackend.Source.Svc
 {
@@ -6,8 +7,12 @@ namespace TermProjectBackend.Source.Svc
     {
         public Appointment BookAppointment(AppointmentDTO newAppointment,int id);
 
-        Appointment GetAppointmentById(int appointmentId);
-        void RemoveAppointment(Appointment appointment);
+        public Appointment GetAppointmentById(int appointmentId);
+        public void RemoveAppointment(int id);
+
+        public void UpdateAppointment(ManageAppointmentDTO appointment);
+
+
 
         
     }

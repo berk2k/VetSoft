@@ -20,7 +20,28 @@ namespace TermProjectBackend.Controllers
             _response = new APIResponse();
         }
 
-        [HttpGet]
+        [HttpGet("Get UserId By UserName")]
+        public ActionResult GetUserIdByName(string userName) {
+            try
+            {
+                // Assuming userService is an instance of UserService injected into the controller
+                int userId = _userService.getUserIdByName(userName);
+                return Ok(userId);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it accordingly
+                return StatusCode(500, "Internal server error");
+            }
+
+
+        }
+
+        [HttpGet("Get User Info")]
     //    [Authorize]
         public ActionResult<UserProfileDTO> GetUserInfo(int id)
         {

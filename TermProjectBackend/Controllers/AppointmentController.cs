@@ -2,11 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TermProjectBackend.Models;
+using TermProjectBackend.Models.Dto;
 using TermProjectBackend.Source.Svc;
 
 namespace TermProjectBackend.Controllers
 {
-    [Route("api/AddPet")]
+    [Route("api/Appointment")]
     [ApiController]
     public class AppointmentController : Controller
     {
@@ -67,6 +68,62 @@ namespace TermProjectBackend.Controllers
                 IsSuccess = true,
                 Status = "Success"
             });
+        }
+
+        [HttpPost("Update")]
+        public ActionResult UpdateAppointment([FromBody] ManageAppointmentDTO requestDTO)
+        {
+
+
+
+            if (requestDTO.Id == 0)
+            {
+                return BadRequest(new APIResponse
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    IsSuccess = false,
+                    Status = "Fail",
+                    ErrorMessage = "Error update item. check id"
+                });
+            }
+
+            
+
+            try
+            {
+                _appointmentService.UpdateAppointment(requestDTO);
+                return Ok(new APIResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Status = "Success"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while updating the appointment: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("Delete")]
+        public ActionResult DeleteAppointment(int id)
+        {
+            try
+            {
+                // Assuming userService is an instance of your UserService class
+                _appointmentService.RemoveAppointment(id);
+                return Ok(new { Message = "Appointment deleted successfully." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Handle the case where the user is not found
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(500, new { Message = "An error occurred while deleting the customer." });
+            }
         }
     }
 }

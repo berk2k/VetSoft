@@ -25,6 +25,19 @@ namespace TermProjectBackend.Source.Svc
             return user.Id;
         }
 
+        public int getUserIdByName(string userName)
+        {
+            var user = _vetDb.Users.FirstOrDefault(u => u.UserName == userName);
+            if (user != null)
+            {
+                return user.Id;
+            }
+            else
+            {
+                throw new ArgumentException("User not found", nameof(userName));
+            }
+        }
+
         public User GetUserInformationById(int id)
         {
             // Assuming User has an Id property
@@ -142,5 +155,13 @@ namespace TermProjectBackend.Source.Svc
             _vetDb.SaveChanges();
         }
 
-    }
+        
+
+        public List<string> GetAllUserNames()
+        {
+            // Assuming User entity has a property called "userName"
+            return _vetDb.Users.Select(u => u.UserName).ToList();
+        }
+
+}
 }
