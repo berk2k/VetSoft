@@ -20,7 +20,7 @@ namespace TermProjectBackend.Controllers
             _response = new APIResponse();
         }
 
-        [HttpGet("Get UserId By UserName")]
+        [HttpGet("GetUserIdByUserName")]
         public ActionResult GetUserIdByName(string userName) {
             try
             {
@@ -41,7 +41,26 @@ namespace TermProjectBackend.Controllers
 
         }
 
-        [HttpGet("Get User Info")]
+        [HttpGet("GetAllUsers")]
+        public ActionResult<List<User>> GetAllUsers()
+        {
+            try
+            {
+                // Fetch all users from the data source
+                var users = _userService.GetAllUserNames();
+
+                // Return the list of users
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it accordingly
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+
+        [HttpGet("GetUserInfo")]
     //    [Authorize]
         public ActionResult<UserProfileDTO> GetUserInfo(int id)
         {

@@ -22,6 +22,10 @@ namespace TermProjectBackend.Context
 
         public DbSet<Item> Items { get; set; }
 
-        public DbSet<VaccinationRecord> VaccinationRecord {  get; set; } 
+        public DbSet<VaccinationRecord> VaccinationRecord {  get; set; }
+
+        public DbSet<Review> Reviews { get; set; }
+
+
     }
 }

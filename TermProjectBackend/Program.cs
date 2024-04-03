@@ -22,6 +22,7 @@ builder.Services.AddScoped<IVetStaffService,VetStaffService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IVaccinationService, VaccinationService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

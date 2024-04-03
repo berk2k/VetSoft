@@ -18,7 +18,7 @@ namespace TermProjectBackend.Controllers
 
         }
 
-        [HttpPost("Send Notification")]
+        [HttpPost("SendNotification")]
         // [Authorize]
         public ActionResult Send([FromBody] NotificationRequestDTO notificationRequest)
         {
