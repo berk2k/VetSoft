@@ -77,5 +77,13 @@ namespace TermProjectBackend.Source.Svc
                 _vetDb.SaveChanges();
             }
         }
+
+        public List<Appointment> GetAppointmentsPerPage(int page, int pageSize)
+        {
+            return _vetDb.Appointments
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
     }
 }

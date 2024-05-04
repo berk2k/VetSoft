@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TermProjectBackend.Context;
@@ -70,5 +71,41 @@ namespace TermProjectBackend.Source.Svc
         {
             return _vetDb.Items.ToList();
         }
+
+        public List<Item> GetItemsPerPage(int page, int pageSize)
+        {
+            return _vetDb.Items
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
+        public List<Item> GetItemByName(string medicineName)
+        {
+            try
+            {
+                //autocomplete
+                var items = _vetDb.Items
+                .Where(i => i.medicine_name.Contains(medicineName))
+                .ToList();
+
+
+                if (items != null)
+                {
+                    return items;
+                }
+                else
+                {
+                    
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                
+                throw new Exception($"Error occurred while getting item by name: {ex.Message}");
+            }
+        }
+
     }
 }

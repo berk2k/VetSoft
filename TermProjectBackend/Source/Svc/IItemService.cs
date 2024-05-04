@@ -10,5 +10,9 @@ namespace TermProjectBackend.Source.Svc
         public void UpdateItem(UpdateItemRequestDTO updateItemRequestDTO);
 
         public List<Item> GetAllItems();
+
+        List<Item> GetItemsPerPage(int page, int pageSize);
+
+        public List<Item> GetItemByName (string medicineName);
     }
 }

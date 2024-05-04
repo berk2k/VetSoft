@@ -125,5 +125,19 @@ namespace TermProjectBackend.Controllers
                 return StatusCode(500, new { Message = "An error occurred while deleting the customer." });
             }
         }
+
+        [HttpGet("GetAllAppointments")]
+        public ActionResult<List<Appointment>> GetAllAppointments(int page = 1)
+        {
+            try
+            {
+                var items = _appointmentService.GetAppointmentsPerPage(page, 10);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while fetching items: {ex.Message}");
+            }
+        }
     }
 }

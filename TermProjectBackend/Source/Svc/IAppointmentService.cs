@@ -12,8 +12,10 @@ namespace TermProjectBackend.Source.Svc
 
         public void UpdateAppointment(ManageAppointmentDTO appointment);
 
+        List<Appointment> GetAppointmentsPerPage(int page, int pageSize);
 
 
-        
+
+
     }
 }

@@ -97,12 +97,12 @@ namespace TermProjectBackend.Controllers
             }
         }
 
-        [HttpGet("Get All Items")]
-        public ActionResult<List<Item>> GetAllItems()
+        [HttpGet("GetAllItems")]
+        public ActionResult<List<Item>> GetAllItems(int page = 1)
         {
             try
             {
-                var items = _itemService.GetAllItems();
+                var items = _itemService.GetItemsPerPage(page, 10);
                 return Ok(items);
             }
             catch (Exception ex)
@@ -110,6 +110,30 @@ namespace TermProjectBackend.Controllers
                 return StatusCode(500, $"An error occurred while fetching items: {ex.Message}");
             }
         }
+
+        [HttpGet("GetItemByName")]
+        public ActionResult<Item> GetItemByName(string medicineName)
+        {
+            try
+            {
+                var item = _itemService.GetItemByName(medicineName);
+
+                if (item != null)
+                {
+                    return Ok(item); 
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while getting item by name: {ex.Message}");
+            }
+        }
+
+
 
 
 
