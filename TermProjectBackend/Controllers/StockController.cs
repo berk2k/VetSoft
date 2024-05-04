@@ -133,6 +133,29 @@ namespace TermProjectBackend.Controllers
             }
         }
 
+        [HttpGet("GetItemsWithZeroCount")]
+        public ActionResult<List<Item>> GetItemsWithZeroCount()
+        {
+            try
+            {
+                var items = _itemService.GetOutOfStockItems();
+
+                if (items.Any())
+                {
+                    return Ok(items); 
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while fetching items with zero count: {ex.Message}"); 
+            }
+        }
+
+
 
 
 

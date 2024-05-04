@@ -14,5 +14,7 @@ namespace TermProjectBackend.Source.Svc
         List<Item> GetItemsPerPage(int page, int pageSize);
 
         public List<Item> GetItemByName (string medicineName);
+
+        public List<Item> GetOutOfStockItems();
     }
 }

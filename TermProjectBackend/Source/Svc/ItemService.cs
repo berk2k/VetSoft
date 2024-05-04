@@ -82,11 +82,12 @@ namespace TermProjectBackend.Source.Svc
 
         public List<Item> GetItemByName(string medicineName)
         {
+            medicineName = medicineName.ToLower();
             try
             {
                 //autocomplete
                 var items = _vetDb.Items
-                .Where(i => i.medicine_name.Contains(medicineName))
+                .Where(i => i.medicine_name.ToLower().Contains(medicineName))
                 .ToList();
 
 
@@ -107,5 +108,13 @@ namespace TermProjectBackend.Source.Svc
             }
         }
 
+        public List<Item> GetOutOfStockItems()
+        {
+            var itemsWithZeroCount = _vetDb.Items
+            .Where(i => i.count == 0)
+            .ToList();
+
+            return itemsWithZeroCount;
+        }
     }
 }
