@@ -122,7 +122,7 @@ namespace TermProjectBackend.Controllers
             catch (Exception ex)
             {
                 // Handle other exceptions
-                return StatusCode(500, new { Message = "An error occurred while deleting the customer." });
+                return StatusCode(500, new { Message = "An error occurred while deleting the appointment." });
             }
         }
 
