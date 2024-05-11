@@ -14,6 +14,8 @@ namespace TermProjectBackend.Source.Svc
 
         List<Appointment> GetAppointmentsPerPage(int page, int pageSize);
 
+        List<Appointment> GetUserAppointments(int page, int pageSize, int userId);
+
 
 
 

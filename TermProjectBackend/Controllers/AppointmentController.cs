@@ -139,5 +139,26 @@ namespace TermProjectBackend.Controllers
                 return StatusCode(500, $"An error occurred while fetching items: {ex.Message}");
             }
         }
+
+        [HttpGet("GetUserAppointments")]
+        public ActionResult<List<Appointment>> GetUserAppointments(int page = 1, int userId = 0)
+        {
+            try
+            {
+                var appointments = _appointmentService.GetUserAppointments(page, 10, userId);
+                var userAppointments = appointments.Select(a => new AppointmentDTO
+                {
+                    Id = a.AppointmentId,
+                    AppointmentDateTime = a.AppointmentDateTime,
+                    PetName = a.PetName,
+                    Reasons = a.Reasons
+                }).ToList();
+                return Ok(userAppointments);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while fetching items: {ex.Message}");
+            }
+        }
     }
 }
