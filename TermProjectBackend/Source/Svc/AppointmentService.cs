@@ -32,7 +32,8 @@ namespace TermProjectBackend.Source.Svc
                 ClientID = id,
                 AppointmentDateTime = newAppointment.AppointmentDateTime,
                 ClientName = user.Name,
-                
+                PetName = newAppointment.PetName,
+                Reasons = newAppointment.Reasons
             };
 
             _vetDb.Appointments.Add(appointment);
@@ -49,7 +50,7 @@ namespace TermProjectBackend.Source.Svc
 
         public void RemoveAppointment(int id)
         {
-            // Check if the appointment exists in the database
+            // Find the appointment in the database
             var existingAppointment = _vetDb.Appointments.FirstOrDefault(a => a.AppointmentId == id);
 
             if (existingAppointment != null)
@@ -64,6 +65,7 @@ namespace TermProjectBackend.Source.Svc
                 throw new InvalidOperationException("Appointment not found.");
             }
         }
+
 
         public void UpdateAppointment(ManageAppointmentDTO appointment)
         {

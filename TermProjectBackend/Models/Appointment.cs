@@ -13,7 +13,11 @@ namespace TermProjectBackend.Models
         public int ClientID { get; set; }
 
         public DateTime AppointmentDateTime { get; set; }
-        public User User { get; set; }
+        //public User User { get; set; }
         public string ClientName { get; set; }
+
+        public string PetName { get; set; }
+
+        public string Reasons { get; set; }
     }
 }
