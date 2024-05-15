@@ -68,6 +68,7 @@ namespace TermProjectBackend.Controllers
                     userId = a.userId,
                     petId = a.petId,
                     message = a.message,
+                    SentAt = a.SentAt
                 }).ToList();
                 return Ok(userReviews);
             }

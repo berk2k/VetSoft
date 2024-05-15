@@ -10,5 +10,7 @@ namespace TermProjectBackend.Source.Svc
 
         public List<Notification> GetUserNotification(int page, int pageSize, int userId);
         public string getName(int id);
+
+        public void SendMessageToVet(VetMessageDTO vetMessageDTO);
     }
 }

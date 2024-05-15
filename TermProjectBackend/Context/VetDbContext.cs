@@ -26,6 +26,8 @@ namespace TermProjectBackend.Context
 
         public DbSet<Review> Reviews { get; set; }
 
+        public DbSet<VeterinarianMessages> VeterinarianMessages { get; set; }
+
 
     }
 }

@@ -3,24 +3,20 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TermProjectBackend.Models
 {
-    public class Review
+    public class VeterinarianMessages
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int reviewId { get; set; }
+        public int MessageId { get; set; }
 
 
         [ForeignKey("User")]
-        public int userId { get; set; }
+        public int UserId { get; set; }
 
-        [ForeignKey("Pet")]
-        public int petId { get; set; }
+        public string MessageTitle { get; set; }
 
-        public string message { get; set; }
-
-        public string userName { get; set; }
-
-        public string petName { get; set; }
+        public string MessageText { get; set; }
+        public string UserName { get; set; }
 
         public DateTime SentAt { get; set; }
     }

@@ -32,6 +32,20 @@ namespace TermProjectBackend.Controllers
             });
         }
 
+        [HttpPost("SendMessageFromUserToVet")]
+        // [Authorize]
+        public ActionResult SendMessageToVet([FromBody] VetMessageDTO notificationRequest)
+        {
+            _notificationService.SendMessageToVet(notificationRequest);
+
+            return Ok(new APIResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Status = "Success"
+            });
+        }
+
         [HttpGet("GetNotificationHistoryForUser")]
         public ActionResult<List<Notification>> GetNotificationsForUser(int page = 1, int userId = 0)
         {

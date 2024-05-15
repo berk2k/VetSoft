@@ -41,13 +41,16 @@ namespace TermProjectBackend.Source.Svc
 
         public void Notification(NotificationRequestDTO notificationRequest)
         {
-            
+            DateTime utcNow = DateTime.UtcNow;
+            TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time"); // Türkiye'nin standart saat dilimi
+            DateTime trTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tzi);
             // Create a new Notification instance
             Notification newNotification = new Notification
             {
                 message = notificationRequest.message,
                 userId = notificationRequest.userId,
                 userName = getName(notificationRequest.userId),
+                SentAt = trTime
             };
 
             // Add the new notification to the Notifications DbSet
@@ -100,6 +103,28 @@ namespace TermProjectBackend.Source.Svc
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
+        }
+
+        public void SendMessageToVet(VetMessageDTO vetMessageDTO)
+        {
+            DateTime utcNow = DateTime.UtcNow;
+            TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time"); // Türkiye'nin standart saat dilimi
+            DateTime trTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tzi);
+
+            VeterinarianMessages newNotification = new VeterinarianMessages
+            {
+                MessageText = vetMessageDTO.messageText,
+                MessageTitle = vetMessageDTO.messageTitle,
+                UserId = vetMessageDTO.userId,
+                UserName = getName(vetMessageDTO.userId),
+                SentAt = trTime
+            };
+
+            // Add the new notification to the Notifications DbSet
+            _vetDb.VeterinarianMessages.Add(newNotification);
+
+            // Save changes to the database
+            _vetDb.SaveChanges();
         }
     }
 }

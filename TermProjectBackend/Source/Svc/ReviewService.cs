@@ -73,6 +73,10 @@ namespace TermProjectBackend.Source.Svc
 
         public Review SendReview(ReviewRequestDTO requestDTO)
         {
+            DateTime utcNow = DateTime.UtcNow;
+            TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time"); // Türkiye'nin standart saat dilimi
+            DateTime trTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tzi);
+
             if (!_vetDb.Pets.Any(p => p.Id == requestDTO.petId && p.OwnerID == requestDTO.userId))
             {
                 throw new InvalidOperationException("pet or user not found.");
@@ -84,7 +88,8 @@ namespace TermProjectBackend.Source.Svc
                 userId = requestDTO.userId,
                 petId = requestDTO.petId,
                 userName = GetUserNameById(requestDTO.userId),
-                petName = GetPetNameById(requestDTO.petId)
+                petName = GetPetNameById(requestDTO.petId),
+                SentAt = trTime
             };
 
             // Add the new notification to the Notifications DbSet

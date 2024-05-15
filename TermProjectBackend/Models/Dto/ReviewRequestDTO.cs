@@ -11,5 +11,7 @@ namespace TermProjectBackend.Models.Dto
         public int petId { get; set; }
 
         public string message { get; set; }
+
+        public DateTime? SentAt { get; set; }
     }
 }

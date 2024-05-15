@@ -16,5 +16,7 @@ namespace TermProjectBackend.Models
         public string message { get; set; }
 
         public string userName { get; set; }
+
+        public DateTime SentAt { get; set; }
     }
 }
