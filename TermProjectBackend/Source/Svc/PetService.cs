@@ -15,21 +15,24 @@ namespace TermProjectBackend.Source.Svc
             
         }
 
-        public GetPetDTO GetPetInformationById(int ownerId)
+        public List<GetPetDTO> GetPetInformationById(int ownerId)
         {
-            GetPetDTO petDTO = _vetDb.Pets
+
+            List<GetPetDTO> petDTOs = _vetDb.Pets
                 .Where(p => p.OwnerID == ownerId)
                 .Select(p => new GetPetDTO
                 {
-                    OwnerId = p.OwnerID,
+                    PetId = p.Id,
                     Name = p.Name,
                     Species = p.Species,
                     Age = p.Age
                 })
-                .FirstOrDefault();
+                .ToList();
 
-            return petDTO;
+
+            return petDTOs;
         }
+
 
         public Pet AddPet(AddPetRequestDTO addPetRequestDTO/*,int id*/)
         {

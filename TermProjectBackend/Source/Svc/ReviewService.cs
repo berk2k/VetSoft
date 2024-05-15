@@ -14,6 +14,15 @@ namespace TermProjectBackend.Source.Svc
             _vetDb = vetDb;
 
         }
+
+        public List<Review> GetAllReviews(int page, int pageSize)
+        {
+            return _vetDb.Reviews
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
         public string GetPetNameById(int id)
         {
             // Query the database to retrieve the pet name by ID
@@ -51,6 +60,15 @@ namespace TermProjectBackend.Source.Svc
                 // Alternatively, you can return null
                 // return null;
             }
+        }
+
+        public List<Review> GetUserReviews(int page, int pageSize, int userId)
+        {
+            return _vetDb.Reviews
+                .Where(review => review.userId == userId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
         }
 
         public Review SendReview(ReviewRequestDTO requestDTO)

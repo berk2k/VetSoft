@@ -10,5 +10,9 @@ namespace TermProjectBackend.Source.Svc
         public string GetPetNameById(int id);
 
         public string GetUserNameById(int id);
+
+        public List<Review> GetAllReviews(int page, int pageSize);
+
+        public List<Review> GetUserReviews(int page, int pageSize, int userId);
     }
 }

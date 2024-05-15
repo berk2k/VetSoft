@@ -21,7 +21,7 @@ namespace TermProjectBackend.Controllers
         {
             try
             {
-                GetPetDTO petDTO = _petService.GetPetInformationById(ownerId);
+                List<GetPetDTO> petDTO = _petService.GetPetInformationById(ownerId);
 
                 if (petDTO == null)
                 {
