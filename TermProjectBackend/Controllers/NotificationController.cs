@@ -31,5 +31,24 @@ namespace TermProjectBackend.Controllers
                 Status = "Success"
             });
         }
+
+        [HttpGet("GetNotificationHistoryForUser")]
+        public ActionResult<List<Notification>> GetNotificationsForUser(int page = 1, int userId = 0)
+        {
+            try
+            {
+                var notifications = _notificationService.GetUserNotification(page, 10, userId);
+                var userNot = notifications.Select(n => new NotificationRequestDTO
+                {
+                    userId = n.userId,
+                    message = n.message,
+                }).ToList();
+                return Ok(userNot);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while fetching items: {ex.Message}");
+            }
+        }
     }
 }

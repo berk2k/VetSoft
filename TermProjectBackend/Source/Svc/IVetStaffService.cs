@@ -15,6 +15,8 @@ namespace TermProjectBackend.Source.Svc
 
         public void UpdateVetStaff(UpdateVetStaffDTO vetStaffDTO);
 
+        public List<VetStaff> GetAllStaff(int page,int pageSize);
+
         
     }
 }

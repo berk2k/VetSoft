@@ -114,5 +114,13 @@ namespace TermProjectBackend.Source.Svc
                 _vetDb.SaveChanges();
             }
         }
+
+        public List<VetStaff> GetAllStaff(int page, int pageSize)
+        {
+            return _vetDb.VetStaff
+               .Skip((page - 1) * pageSize)
+               .Take(pageSize)
+               .ToList();
+        }
     }
 }

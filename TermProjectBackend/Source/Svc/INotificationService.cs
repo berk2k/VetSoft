@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using TermProjectBackend.Models;
 using TermProjectBackend.Models.Dto;
 
 namespace TermProjectBackend.Source.Svc
@@ -7,6 +8,7 @@ namespace TermProjectBackend.Source.Svc
     {
         public void Notification(NotificationRequestDTO notificationRequest);
 
+        public List<Notification> GetUserNotification(int page, int pageSize, int userId);
         public string getName(int id);
     }
 }

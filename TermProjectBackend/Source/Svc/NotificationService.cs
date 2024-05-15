@@ -92,5 +92,14 @@ namespace TermProjectBackend.Source.Svc
                 connection.Close();
             }
         }
+
+        public List<Notification> GetUserNotification(int page, int pageSize, int userId)
+        {
+            return _vetDb.Notification
+                .Where(n => n.userId == userId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
     }
 }

@@ -98,6 +98,27 @@ namespace TermProjectBackend.Controllers
             }
         }
 
+        [HttpGet("GetAllVetStaff")]
+        public ActionResult<List<VetStaff>> GetAllStaff(int page = 1)
+        {
+            try
+            {
+                var items = _vetStaffService.GetAllStaff(page, 10);
+                var staffInfo = items.Select(v => new GetVetStaff
+                {
+                    StaffId = v.Id,
+                    Name = v.Name,
+                    Email = v.Email,
+                    Role = v.Role
+                }).ToList();
+                return Ok(staffInfo);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while fetching items: {ex.Message}");
+            }
+        }
+
 
 
 
