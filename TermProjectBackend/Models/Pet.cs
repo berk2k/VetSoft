@@ -12,7 +12,7 @@ namespace TermProjectBackend.Models
         [ForeignKey("User")]
         public int OwnerID { get; set; }
 
-        public User User { get; set; }
+        //public User User { get; set; }
         public string Name { get; set; }
 
         public string Species { get; set; }

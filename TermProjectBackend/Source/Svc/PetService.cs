@@ -24,6 +24,10 @@ namespace TermProjectBackend.Source.Svc
                 {
                     PetId = p.Id,
                     Name = p.Name,
+                    Allergies = p.Allergies,
+                    Breed = p.Breed,
+                    Gender = p.Gender,
+                    Weight = p.Weight,
                     Species = p.Species,
                     Age = p.Age
                 })
