@@ -6,6 +6,8 @@
 
         public string message { get; set; }
 
+        public DateTime SentAt { get; set; }
+
         
     }
 }

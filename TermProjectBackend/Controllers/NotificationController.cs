@@ -56,6 +56,7 @@ namespace TermProjectBackend.Controllers
                 {
                     userId = n.userId,
                     message = n.message,
+                    SentAt = n.SentAt
                 }).ToList();
                 return Ok(userNot);
             }
