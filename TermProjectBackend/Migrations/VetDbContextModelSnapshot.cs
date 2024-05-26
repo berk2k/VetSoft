@@ -44,7 +44,7 @@ namespace TermProjectBackend.Migrations
 
                     b.HasIndex("ClientID");
 
-                    b.ToTable("Appointments");
+                    b.ToTable("Appointments", (string)null);
                 });
 
             modelBuilder.Entity("TermProjectBackend.Models.Pet", b =>
@@ -92,7 +92,7 @@ namespace TermProjectBackend.Migrations
 
                     b.HasIndex("OwnerID");
 
-                    b.ToTable("Pets");
+                    b.ToTable("Pets", (string)null);
                 });
 
             modelBuilder.Entity("TermProjectBackend.Models.User", b =>
@@ -121,7 +121,7 @@ namespace TermProjectBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("TermProjectBackend.Models.VetStaff", b =>
@@ -150,7 +150,7 @@ namespace TermProjectBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Staffs");
+                    b.ToTable("Staffs", (string)null);
                 });
 
             modelBuilder.Entity("TermProjectBackend.Models.Appointment", b =>

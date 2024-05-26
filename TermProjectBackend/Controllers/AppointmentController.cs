@@ -49,25 +49,39 @@ namespace TermProjectBackend.Controllers
                 });
             }*/
 
-            var appointment = _appointmentService.BookAppointment(appointmentDTO,appointmentDTO.Id);
+            
 
-            if (appointment == null)
+            try
             {
-                return BadRequest(new APIResponse
+                var appointment = _appointmentService.BookAppointment(appointmentDTO, appointmentDTO.Id);
+
+                if (appointment == null)
                 {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    IsSuccess = false,
-                    Status = "Fail",
-                    ErrorMessage = "Error booking appointment"
+                    return BadRequest(new APIResponse
+                    {
+                        StatusCode = HttpStatusCode.BadRequest,
+                        IsSuccess = false,
+                        Status = "Fail",
+                        ErrorMessage = "Error booking appointment"
+                    });
+                }
+                return Ok(new APIResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Status = "Success"
                 });
             }
-
-            return Ok(new APIResponse
+            catch (InvalidOperationException ex)
             {
-                StatusCode = HttpStatusCode.OK,
-                IsSuccess = true,
-                Status = "Success"
-            });
+                // Handle the case where the user is not found
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(500, new { Message = "An error occurred while adding the record." });
+            }
         }
 
         [HttpPost("Update")]
@@ -99,9 +113,16 @@ namespace TermProjectBackend.Controllers
                     Status = "Success"
                 });
             }
+            
+            catch (InvalidOperationException ex)
+            {
+                // Handle the case where the user is not found
+                return NotFound(new { Message = ex.Message });
+            }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred while updating the appointment: {ex.Message}");
+                // Handle other exceptions
+                return StatusCode(500, new { Message = "An error occurred while updating appointment." });
             }
         }
 

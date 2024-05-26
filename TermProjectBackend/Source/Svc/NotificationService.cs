@@ -9,19 +9,19 @@ namespace TermProjectBackend.Source.Svc
     public class NotificationService : INotificationService
     {
         private readonly VetDbContext _vetDb;
-        private readonly ConnectionFactory _connectionFactory;
-        private const string QueueName = "notification_queue";
+        //private readonly ConnectionFactory _connectionFactory;
+        //private const string QueueName = "notification_queue";
         public NotificationService(VetDbContext vetDb) {
 
             _vetDb = vetDb;
 
-            _connectionFactory = new ConnectionFactory
-            {
-                HostName = "localhost", // RabbitMQ sunucu adresi
-                Port = 5672, // RabbitMQ varsayılan bağlantı noktası
-                UserName = "guest", // RabbitMQ kullanıcı adı
-                Password = "guest" // RabbitMQ şifre
-            };
+            //_connectionFactory = new ConnectionFactory
+            //{
+            //    HostName = "localhost", // RabbitMQ sunucu adresi
+            //    Port = 5672, // RabbitMQ varsayılan bağlantı noktası
+            //    UserName = "guest", // RabbitMQ kullanıcı adı
+            //    Password = "guest" // RabbitMQ şifre
+            //};
 
         }
         public string getName(int userId)
@@ -44,6 +44,14 @@ namespace TermProjectBackend.Source.Svc
             DateTime utcNow = DateTime.UtcNow;
             TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time"); // Türkiye'nin standart saat dilimi
             DateTime trTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tzi);
+
+            User user = _vetDb.Users.FirstOrDefault(u => u.Id == notificationRequest.userId);
+
+            if (user == null)
+            {
+                // Handle the case where the user is not found
+                throw new InvalidOperationException($"User with ID {notificationRequest.userId} not found.");
+            }
             // Create a new Notification instance
             Notification newNotification = new Notification
             {
@@ -60,9 +68,10 @@ namespace TermProjectBackend.Source.Svc
             _vetDb.SaveChanges();
 
             //send message to rabbitmq
-            SendMessageToRabbitMQ(newNotification);
+            //SendMessageToRabbitMQ(newNotification);
         }
 
+        /*
         private void SendMessageToRabbitMQ(Notification newNotification)
         {
             // RabbitMQ bağlantısını oluştur
@@ -94,7 +103,7 @@ namespace TermProjectBackend.Source.Svc
                 channel.Close();
                 connection.Close();
             }
-        }
+        }*/
 
         public List<Notification> GetUserNotification(int page, int pageSize, int userId)
         {

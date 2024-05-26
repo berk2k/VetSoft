@@ -22,28 +22,56 @@ namespace TermProjectBackend.Controllers
         // [Authorize]
         public ActionResult Send([FromBody] NotificationRequestDTO notificationRequest)
         {
-            _notificationService.Notification(notificationRequest);
-
-            return Ok(new APIResponse
+            
+            try
             {
-                StatusCode = HttpStatusCode.OK,
-                IsSuccess = true,
-                Status = "Success"
-            });
+                _notificationService.Notification(notificationRequest);
+                return Ok(new APIResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Status = "Success"
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Handle the case where the user is not found
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(500, new { Message = "An error occurred while sending message." });
+            }
+            
         }
 
         [HttpPost("SendMessageFromUserToVet")]
         // [Authorize]
         public ActionResult SendMessageToVet([FromBody] VetMessageDTO notificationRequest)
         {
-            _notificationService.SendMessageToVet(notificationRequest);
+            
 
-            return Ok(new APIResponse
+            try
             {
-                StatusCode = HttpStatusCode.OK,
-                IsSuccess = true,
-                Status = "Success"
-            });
+                _notificationService.SendMessageToVet(notificationRequest);
+                return Ok(new APIResponse
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Status = "Success"
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Handle the case where the user is not found
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(500, new { Message = "An error occurred while sending message." });
+            }
         }
 
         [HttpGet("GetNotificationHistoryForUser")]
@@ -60,9 +88,15 @@ namespace TermProjectBackend.Controllers
                 }).ToList();
                 return Ok(userNot);
             }
+            catch (InvalidOperationException ex)
+            {
+                // Handle the case where the user is not found
+                return NotFound(new { Message = ex.Message });
+            }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred while fetching items: {ex.Message}");
+                // Handle other exceptions
+                return StatusCode(500, new { Message = "An error occurred while adding the record." });
             }
         }
     }
