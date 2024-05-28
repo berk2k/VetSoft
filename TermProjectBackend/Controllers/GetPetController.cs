@@ -36,5 +36,26 @@ namespace TermProjectBackend.Controllers
                 return StatusCode(500, new { Message = "An error occurred while retrieving pet information." });
             }
         }
+
+        [HttpGet("GetPetNameById")]
+        public IActionResult GetPetName(int id)
+        {
+            try
+            {
+                string petName = _petService.GetPetNameById(id);
+
+                if (petName == null)
+                {
+                    return NotFound(new { Message = "Pet not found for the specified owner ID." });
+                }
+
+                return Ok(petName);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it appropriately
+                return StatusCode(500, new { Message = "An error occurred while retrieving pet information." });
+            }
+        }
     }
 }

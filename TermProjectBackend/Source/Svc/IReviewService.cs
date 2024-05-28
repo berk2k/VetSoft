@@ -14,5 +14,7 @@ namespace TermProjectBackend.Source.Svc
         public List<Review> GetAllReviews(int page, int pageSize);
 
         public List<Review> GetUserReviews(int page, int pageSize, int userId);
+
+        public List<Review> GetUserReviewsWOPagination(int userId);
     }
 }

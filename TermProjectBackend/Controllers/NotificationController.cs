@@ -99,5 +99,58 @@ namespace TermProjectBackend.Controllers
                 return StatusCode(500, new { Message = "An error occurred while adding the record." });
             }
         }
+
+        [HttpGet("GetNotificationHistoryForUserWOPagination")]
+        public ActionResult<List<Notification>> GetNotificationsForUserWOPagination(int userId = 0)
+        {
+            try
+            {
+                var notifications = _notificationService.GetUserNotificationWOPagination(userId);
+                var userNot = notifications.Select(n => new NotificationRequestDTO
+                {
+                    userId = n.userId,
+                    message = n.message,
+                    SentAt = n.SentAt
+                }).ToList();
+                return Ok(userNot);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Handle the case where the user is not found
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(500, new { Message = "An error occurred while adding the record." });
+            }
+        }
+
+        [HttpGet("GetNotificationHistoryForVet")]
+        public ActionResult<List<Notification>> GetNotificationsForVet(int userId = 0)
+        {
+            try
+            {
+                var notifications = _notificationService.GetVeterinarianMessages(userId);
+                var userNot = notifications.Select(n => new VetMessageDTO
+                {
+                    userId = n.UserId,
+                    messageTitle = n.MessageTitle,
+                    messageText = n.MessageText,
+                    SentAt = n.SentAt
+                }).ToList();
+                return Ok(userNot);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Handle the case where the user is not found
+                return NotFound(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(500, new { Message = "An error occurred while adding the record." });
+            }
+        }
     }
 }

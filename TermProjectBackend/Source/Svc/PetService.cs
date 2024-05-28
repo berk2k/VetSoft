@@ -72,7 +72,20 @@ namespace TermProjectBackend.Source.Svc
             return false;
         }
 
-        
+        public string GetPetNameById(int id)
+        {
+            var pet = _vetDb.Pets.FirstOrDefault(p => p.Id == id);
+
+            if (pet != null)
+            {
+                return pet.Name;
+            }
+            else
+            {
+                throw new ArgumentException("No pet found with the provided ID.");
+            }
+        }
+
     }
 }
 

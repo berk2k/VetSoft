@@ -42,7 +42,25 @@ namespace TermProjectBackend.Source.Svc
                 return newRecord;
             }
 
-            public List<GetVaccinationReportDTO> GetAllVaccinationHistoryForUser(int id)
+        public List<GetVaccinationReportDTO> GetAllVaccinationHistoryForUser(int page, int pageSize, int id)
+        {
+            var vaccinationHistory = _vetDb.VaccinationRecord
+                .Where(v => v.userId == id)
+                .Select(v => new GetVaccinationReportDTO
+                {
+                    petName = v.petName,
+                    vaccineName = v.vaccine_name,
+                    date = v.vaccine_date
+                    //date = DateTime.Parse(v.date).ToString("yyyy-MM-dd") // Parse string to DateTime
+                })
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return vaccinationHistory;
+        }
+
+        public List<GetVaccinationReportDTO> GetAllVaccinationHistoryForUserWOPagination(int id)
             {
                 var vaccinationHistory = _vetDb.VaccinationRecord
                 .Where(v => v.userId == id)

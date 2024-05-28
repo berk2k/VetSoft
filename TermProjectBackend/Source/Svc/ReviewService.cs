@@ -71,6 +71,13 @@ namespace TermProjectBackend.Source.Svc
                 .ToList();
         }
 
+        public List<Review> GetUserReviewsWOPagination(int userId)
+        {
+            return _vetDb.Reviews
+                .Where(review => review.userId == userId)
+                .ToList();
+        }
+
         public Review SendReview(ReviewRequestDTO requestDTO)
         {
             DateTime utcNow = DateTime.UtcNow;

@@ -16,7 +16,7 @@ namespace TermProjectBackend.Controllers
             _itemService = itemService;
         }
 
-        [HttpPost("Add Item")]
+        [HttpPost("AddItem")]
         public ActionResult AddItem([FromBody] AddItemRequestDTO requestDTO)
         {
             

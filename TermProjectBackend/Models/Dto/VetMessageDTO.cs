@@ -7,5 +7,7 @@
         public string messageText { get; set; }
 
         public string messageTitle { get; set; }
+
+        public DateTime SentAt { get; set; }
     }
 }

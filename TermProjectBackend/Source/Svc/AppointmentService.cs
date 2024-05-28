@@ -131,13 +131,20 @@ namespace TermProjectBackend.Source.Svc
                 .ToList();
         }
 
+        public List<Appointment> GetUserAppointmentsWOPagination(int userId)
+        {
+            return _vetDb.Appointments
+                .Where(appointment => appointment.ClientID == userId)
+                .ToList ();
+        }
+
         //private void SendDeleteAppointmentMessageToRabbitMQ()
         //{
         //    string deleteMessage = "Your appointment deleted";
         //    using (var connection = _connectionFactory.CreateConnection())
         //    using (var channel = connection.CreateModel())
         //    {
-                
+
         //        channel.QueueDeclare(queue: QueueNameDelete,
         //                             durable: false,
         //                             exclusive: false,
@@ -150,11 +157,11 @@ namespace TermProjectBackend.Source.Svc
         //        string message = Newtonsoft.Json.JsonConvert.SerializeObject(deleteMessage);
         //        var body = Encoding.UTF8.GetBytes(message);
 
-               
 
 
 
-                
+
+
         //        channel.BasicPublish(exchange: "direct_exchange",
         //                             routingKey: QueueNameDelete,
         //                             basicProperties: null,

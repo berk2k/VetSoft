@@ -77,5 +77,26 @@ namespace TermProjectBackend.Controllers
                 return StatusCode(500, $"An error occurred while fetching items: {ex.Message}");
             }
         }
+
+        [HttpGet("GetReviewsHistoryForUserWOPagination")]
+        public ActionResult<List<Review>> GetReviewsForUserWOPagination(int userId = 0)
+        {
+            try
+            {
+                var reviews = _reviewService.GetUserReviewsWOPagination(userId);
+                var userReviews = reviews.Select(a => new ReviewRequestDTO
+                {
+                    userId = a.userId,
+                    petId = a.petId,
+                    message = a.message,
+                    SentAt = a.SentAt
+                }).ToList();
+                return Ok(userReviews);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while fetching items: {ex.Message}");
+            }
+        }
     }
 }

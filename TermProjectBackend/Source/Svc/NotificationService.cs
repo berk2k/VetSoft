@@ -135,5 +135,17 @@ namespace TermProjectBackend.Source.Svc
             // Save changes to the database
             _vetDb.SaveChanges();
         }
+
+        public List<Notification> GetUserNotificationWOPagination(int userId)
+        {
+            return _vetDb.Notification
+            .Where(n => n.userId == userId).ToList();
+        }
+
+        public List<VeterinarianMessages> GetVeterinarianMessages(int userId)
+        {
+            return _vetDb.VeterinarianMessages
+            .Where(n => n.UserId == userId).ToList();
+        }
     }
 }

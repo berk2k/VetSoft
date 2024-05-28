@@ -145,12 +145,27 @@ namespace TermProjectBackend.Controllers
             }
         }
 
-        [HttpGet("GetAllVaccinationHistoryForUser")]
-        public ActionResult<List<GetVaccinationReportDTO>> GetAllVaccinationHistoryForUser(int id)
+        [HttpGet("GetAllVaccinationHistoryForUserWOPagination")]
+        public ActionResult<List<GetVaccinationReportDTO>> GetAllVaccinationHistoryForUserWOPagination(int id = 0)
         {
             try
             {
-                var vaccinationHistory = _vaccinationService.GetAllVaccinationHistoryForUser(id);
+                var vaccinationHistory = _vaccinationService.GetAllVaccinationHistoryForUserWOPagination(id);
+                return Ok(vaccinationHistory);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it accordingly
+                return StatusCode(500, new { Message = "An error occurred while retrieving vaccination history." });
+            }
+        }
+
+        [HttpGet("GetAllVaccinationHistoryForUser")]
+        public ActionResult<List<GetVaccinationReportDTO>> GetAllVaccinationHistoryForUser(int page = 1,int id = 0)
+        {
+            try
+            {
+                var vaccinationHistory = _vaccinationService.GetAllVaccinationHistoryForUser(page,10,id);
                 return Ok(vaccinationHistory);
             }
             catch (Exception ex)

@@ -9,7 +9,9 @@ namespace TermProjectBackend.Source.Svc
 
         public void RemoveVaccinationReport(int id);
 
-        public List<GetVaccinationReportDTO> GetAllVaccinationHistoryForUser(int id);
+        public List<GetVaccinationReportDTO> GetAllVaccinationHistoryForUserWOPagination(int id);
+
+        public List<GetVaccinationReportDTO> GetAllVaccinationHistoryForUser(int page, int pageSize, int id);
 
     }
 }

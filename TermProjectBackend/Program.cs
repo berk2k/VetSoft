@@ -18,11 +18,20 @@ builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddScoped<LoginController>();
 builder.Services.AddScoped<AddPetController>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
-builder.Services.AddScoped<IVetStaffService,VetStaffService>();
+builder.Services.AddScoped<IVetStaffService, VetStaffService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IVaccinationService, VaccinationService>();
-builder.Services.AddScoped<IReviewService, ReviewService>();
+
+// CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowOrigin",
+        builder => builder.WithOrigins("http://127.0.0.1:5000")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod());
+});
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -101,6 +110,8 @@ app.UseSwaggerUI(options =>
 });
 
 app.UseHttpsRedirection();
+// Use CORS middleware
+app.UseCors("AllowOrigin");
 
 app.UseAuthentication();
 app.UseAuthorization();
