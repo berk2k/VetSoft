@@ -9,19 +9,19 @@ namespace TermProjectBackend.Source.Svc
     public class NotificationService : INotificationService
     {
         private readonly VetDbContext _vetDb;
-        //private readonly ConnectionFactory _connectionFactory;
-        //private const string QueueName = "notification_queue";
+        private readonly ConnectionFactory _connectionFactory;
+        private const string QueueName = "notification_queue";
         public NotificationService(VetDbContext vetDb) {
 
             _vetDb = vetDb;
 
-            //_connectionFactory = new ConnectionFactory
-            //{
-            //    HostName = "localhost", // RabbitMQ sunucu adresi
-            //    Port = 5672, // RabbitMQ varsayılan bağlantı noktası
-            //    UserName = "guest", // RabbitMQ kullanıcı adı
-            //    Password = "guest" // RabbitMQ şifre
-            //};
+            _connectionFactory = new ConnectionFactory
+            {
+                HostName = "localhost", // RabbitMQ sunucu adresi
+                Port = 5672, // RabbitMQ varsayılan bağlantı noktası
+                UserName = "guest", // RabbitMQ kullanıcı adı
+                Password = "guest" // RabbitMQ şifre
+            };
 
         }
         public string getName(int userId)
@@ -68,17 +68,17 @@ namespace TermProjectBackend.Source.Svc
             _vetDb.SaveChanges();
 
             //send message to rabbitmq
-            //SendMessageToRabbitMQ(newNotification);
+            SendMessageToRabbitMQ(newNotification);
         }
 
-        /*
+
         private void SendMessageToRabbitMQ(Notification newNotification)
         {
-            // RabbitMQ bağlantısını oluştur
+            
             using (var connection = _connectionFactory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
-                // Bildirim kuyruğunu oluştur
+                
                 channel.QueueDeclare(queue: QueueName,
                                      durable: false,
                                      exclusive: false,
@@ -87,15 +87,15 @@ namespace TermProjectBackend.Source.Svc
 
                 channel.ExchangeDeclare("direct_exchange", ExchangeType.Fanout, true);
 
-                // Bildirim verisini JSON formatına dönüştür
+                
                 string message = Newtonsoft.Json.JsonConvert.SerializeObject(newNotification);
                 var body = Encoding.UTF8.GetBytes(message);
 
-                //channel.BasicPublish("webAppExchange", "", null, body);
+               
+
+
 
                 
-
-                // Mesajı RabbitMQ kuyruğuna gönder
                 channel.BasicPublish(exchange: "direct_exchange",
                                      routingKey: QueueName,
                                      basicProperties: null,
@@ -103,7 +103,7 @@ namespace TermProjectBackend.Source.Svc
                 channel.Close();
                 connection.Close();
             }
-        }*/
+        }
 
         public List<Notification> GetUserNotification(int page, int pageSize, int userId)
         {

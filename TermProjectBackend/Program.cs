@@ -24,13 +24,18 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IVaccinationService, VaccinationService>();
 
+builder.Services.AddSingleton<RabbitMqService>();
+
 // CORS configuration
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowOrigin",
-        builder => builder.WithOrigins("http://127.0.0.1:5000")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod());
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
 });
 
 
@@ -97,21 +102,21 @@ builder.Services.AddDbContext<VetDbContext>(option =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
-app.UseSwagger();
-app.UseSwaggerUI(options =>
+if (app.Environment.IsDevelopment())
 {
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Soft_Vet");
-    options.RoutePrefix = String.Empty;
-});
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+//app.UseSwagger();
+//app.UseSwaggerUI(options =>
+//{
+//    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Soft_Vet");
+//    options.RoutePrefix = String.Empty;
+//});
 
 app.UseHttpsRedirection();
 // Use CORS middleware
-app.UseCors("AllowOrigin");
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();

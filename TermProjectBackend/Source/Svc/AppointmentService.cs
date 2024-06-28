@@ -11,27 +11,27 @@ namespace TermProjectBackend.Source.Svc
     {
         private readonly VetDbContext _vetDb;
         private readonly INotificationService _notificationService;
-        //private readonly ConnectionFactory _connectionFactory;
-        //private const string QueueNameDelete = "delete_appointment_queue";
-        //private const string QueueNameUpdate = "update_appointment_queue";
+        private readonly ConnectionFactory _connectionFactory;
+        private const string QueueNameDelete = "delete_appointment_queue";
+        private const string QueueNameUpdate = "update_appointment_queue";
 
         public AppointmentService(VetDbContext vetDb, INotificationService notificationService)
         {
             _vetDb = vetDb;
             _notificationService = notificationService;
-            //_connectionFactory = new ConnectionFactory
-            //{
-            //    HostName = "localhost", // RabbitMQ sunucu adresi
-            //    Port = 5672, // RabbitMQ varsayılan bağlantı noktası
-            //    UserName = "guest", // RabbitMQ kullanıcı adı
-            //    Password = "guest" // RabbitMQ şifre
-            //};
+            _connectionFactory = new ConnectionFactory
+            {
+                HostName = "localhost", // RabbitMQ sunucu adresi
+                Port = 5672, // RabbitMQ varsayılan bağlantı noktası
+                UserName = "guest", // RabbitMQ kullanıcı adı
+                Password = "guest" // RabbitMQ şifre
+            };
 
         }
 
-        public Appointment BookAppointment(AppointmentDTO newAppointment,int id)
+        public Appointment BookAppointment(AppointmentDTO newAppointment, int id)
         {
-            
+
 
             User user = _vetDb.Users.FirstOrDefault(u => u.Id == id);
 
@@ -98,7 +98,7 @@ namespace TermProjectBackend.Source.Svc
                 {
                     appointmentToUpdate.AppointmentDateTime = appointment.AppointmentDateTime;
                     _vetDb.SaveChanges();
-
+                    SendUpdateAppointmentMessageToRabbitMQ(appointment.AppointmentDateTime);
                     var notificationRequest = new NotificationRequestDTO
                     {
                         userId = appointmentToUpdate.ClientID,
@@ -125,7 +125,7 @@ namespace TermProjectBackend.Source.Svc
         public List<Appointment> GetUserAppointments(int page, int pageSize, int userId)
         {
             return _vetDb.Appointments
-                .Where(appointment => appointment.ClientID == userId) 
+                .Where(appointment => appointment.ClientID == userId)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -135,7 +135,7 @@ namespace TermProjectBackend.Source.Svc
         {
             return _vetDb.Appointments
                 .Where(appointment => appointment.ClientID == userId)
-                .ToList ();
+                .ToList();
         }
 
         //private void SendDeleteAppointmentMessageToRabbitMQ()
@@ -171,38 +171,38 @@ namespace TermProjectBackend.Source.Svc
         //    }
         //}
 
-        //private void SendUpdateAppointmentMessageToRabbitMQ(DateTime newAppointmentDate)
-        //{
-        //    string updateMsg = "Your appointment date updated. New date:";
-        //    using (var connection = _connectionFactory.CreateConnection())
-        //    using (var channel = connection.CreateModel())
-        //    {
+        private void SendUpdateAppointmentMessageToRabbitMQ(DateTime newAppointmentDate)
+        {
+            string updateMsg = "Your appointment date updated. New date:";
+            using (var connection = _connectionFactory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
 
-        //        channel.QueueDeclare(queue: QueueNameUpdate,
-        //                             durable: false,
-        //                             exclusive: false,
-        //                             autoDelete: false,
-        //                             arguments: null);
+                channel.QueueDeclare(queue: QueueNameUpdate,
+                                     durable: false,
+                                     exclusive: false,
+                                     autoDelete: false,
+                                     arguments: null);
 
-        //        channel.ExchangeDeclare("direct_exchange", ExchangeType.Fanout, true);
+                channel.ExchangeDeclare("direct_exchange", ExchangeType.Fanout, true);
 
-        //        // Bildirim verisini JSON formatına dönüştür
-        //        string message = Newtonsoft.Json.JsonConvert.SerializeObject(updateMsg+newAppointmentDate);
-        //        var body = Encoding.UTF8.GetBytes(message);
-
-
+                // Bildirim verisini JSON formatına dönüştür
+                string message = Newtonsoft.Json.JsonConvert.SerializeObject(updateMsg + newAppointmentDate);
+                var body = Encoding.UTF8.GetBytes(message);
 
 
 
 
-        //        channel.BasicPublish(exchange: "direct_exchange",
-        //                             routingKey: QueueNameUpdate,
-        //                             basicProperties: null,
-        //                             body: body);
-        //        channel.Close();
-        //        connection.Close();
-        //    }
-        //}
+
+
+                channel.BasicPublish(exchange: "direct_exchange",
+                                     routingKey: QueueNameUpdate,
+                                     basicProperties: null,
+                                     body: body);
+                channel.Close();
+                connection.Close();
+            }
+        }
 
     }
 }
