@@ -14,11 +14,13 @@ namespace TermProjectBackend.Source.Svc
         private readonly ConnectionFactory _connectionFactory;
         private const string QueueNameDelete = "delete_appointment_queue";
         private const string QueueNameUpdate = "update_appointment_queue";
+        private readonly RabbitMqService _rabbitMqService;
 
-        public AppointmentService(VetDbContext vetDb, INotificationService notificationService)
+        public AppointmentService(VetDbContext vetDb, INotificationService notificationService, RabbitMqService rabbitMqService)
         {
             _vetDb = vetDb;
             _notificationService = notificationService;
+            _rabbitMqService = rabbitMqService;
             _connectionFactory = new ConnectionFactory
             {
                 HostName = "localhost", // RabbitMQ sunucu adresi
@@ -26,7 +28,7 @@ namespace TermProjectBackend.Source.Svc
                 UserName = "guest", // RabbitMQ kullanıcı adı
                 Password = "guest" // RabbitMQ şifre
             };
-
+            
         }
 
         public Appointment BookAppointment(AppointmentDTO newAppointment, int id)
@@ -94,18 +96,30 @@ namespace TermProjectBackend.Source.Svc
             {
                 var appointmentToUpdate = _vetDb.Appointments.FirstOrDefault(i => i.AppointmentId == appointment.Id);
 
-                if (appointmentToUpdate != null)
+                if (appointmentToUpdate == null)
                 {
-                    appointmentToUpdate.AppointmentDateTime = appointment.AppointmentDateTime;
-                    _vetDb.SaveChanges();
-                    SendUpdateAppointmentMessageToRabbitMQ(appointment.AppointmentDateTime);
-                    var notificationRequest = new NotificationRequestDTO
-                    {
-                        userId = appointmentToUpdate.ClientID,
-                        message = $"Your appointment has been updated to {appointment.AppointmentDateTime}"
-                    };
-                    _notificationService.Notification(notificationRequest);
+                    throw new InvalidOperationException($"No appointment found with ID {appointment.Id}");
                 }
+
+                appointmentToUpdate.AppointmentDateTime = appointment.AppointmentDateTime;
+                _vetDb.SaveChanges();
+
+                var notificationRequest = new NotificationRequestDTO
+                {
+                    userId = appointmentToUpdate.ClientID,
+                    message = $"Your appointment has been updated to {appointment.AppointmentDateTime}"
+                };
+
+                // Loglama: notificationRequest'in içeriğini kontrol edelim
+                Console.WriteLine($"NotificationRequest: userId={notificationRequest.userId}, message={notificationRequest.message}");
+
+                string message = Newtonsoft.Json.JsonConvert.SerializeObject(notificationRequest);
+
+                // Loglama: Serileştirilmiş mesajın içeriğini kontrol edelim
+                Console.WriteLine($"Serialized message: {message}");
+
+                _rabbitMqService.SendMessageToRabbitMQ(QueueNameUpdate, message);
+                //_notificationService.Notification(notificationRequest);
             }
             catch (Exception ex)
             {
@@ -113,6 +127,8 @@ namespace TermProjectBackend.Source.Svc
                 throw new InvalidOperationException("An error occurred while updating the appointment.", ex);
             }
         }
+
+
 
         public List<Appointment> GetAppointmentsPerPage(int page, int pageSize)
         {
