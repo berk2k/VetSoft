@@ -16,18 +16,18 @@ namespace TermProjectBackend.Source.Svc
         private const string QueueNameUpdate = "update_appointment_queue";
         private readonly RabbitMqService _rabbitMqService;
 
-        public AppointmentService(VetDbContext vetDb, INotificationService notificationService, RabbitMqService rabbitMqService)
+        public AppointmentService(VetDbContext vetDb, INotificationService notificationService/*, RabbitMqService rabbitMqService*/)
         {
             _vetDb = vetDb;
             _notificationService = notificationService;
-            _rabbitMqService = rabbitMqService;
-            _connectionFactory = new ConnectionFactory
-            {
-                HostName = "localhost", // RabbitMQ sunucu adresi
-                Port = 5672, // RabbitMQ varsayılan bağlantı noktası
-                UserName = "guest", // RabbitMQ kullanıcı adı
-                Password = "guest" // RabbitMQ şifre
-            };
+            //_rabbitMqService = rabbitMqService;
+            //_connectionFactory = new ConnectionFactory
+            //{
+            //    HostName = "localhost", // RabbitMQ sunucu adresi
+            //    Port = 5672, // RabbitMQ varsayılan bağlantı noktası
+            //    UserName = "guest", // RabbitMQ kullanıcı adı
+            //    Password = "guest" // RabbitMQ şifre
+            //};
             
         }
 
@@ -35,7 +35,7 @@ namespace TermProjectBackend.Source.Svc
         {
 
 
-            User user = _vetDb.Users.FirstOrDefault(u => u.Id == id);
+            User user = _vetDb.Users.Find(id);
 
             if (user == null)
             {
@@ -61,13 +61,13 @@ namespace TermProjectBackend.Source.Svc
         public Appointment GetAppointmentById(int appointmentId)
         {
             // Retrieve the appointment from the database based on the provided appointmentId
-            return _vetDb.Appointments.FirstOrDefault(a => a.AppointmentId == appointmentId);
+            return _vetDb.Appointments.Find(appointmentId);
         }
 
         public void RemoveAppointment(int id)
         {
             // Find the appointment in the database
-            var existingAppointment = _vetDb.Appointments.FirstOrDefault(a => a.AppointmentId == id);
+            var existingAppointment = _vetDb.Appointments.Find(id);
 
             if (existingAppointment != null)
             {
@@ -94,7 +94,7 @@ namespace TermProjectBackend.Source.Svc
         {
             try
             {
-                var appointmentToUpdate = _vetDb.Appointments.FirstOrDefault(i => i.AppointmentId == appointment.Id);
+                var appointmentToUpdate = _vetDb.Appointments.Find(appointment.Id);
 
                 if (appointmentToUpdate == null)
                 {
@@ -118,7 +118,7 @@ namespace TermProjectBackend.Source.Svc
                 // Loglama: Serileştirilmiş mesajın içeriğini kontrol edelim
                 Console.WriteLine($"Serialized message: {message}");
 
-                _rabbitMqService.SendMessageToRabbitMQ(QueueNameUpdate, message);
+                //_rabbitMqService.SendMessageToRabbitMQ(QueueNameUpdate, message);
                 //_notificationService.Notification(notificationRequest);
             }
             catch (Exception ex)
@@ -135,6 +135,7 @@ namespace TermProjectBackend.Source.Svc
             return _vetDb.Appointments
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .AsQueryable()
                 .ToList();
         }
 
@@ -142,6 +143,7 @@ namespace TermProjectBackend.Source.Svc
         {
             return _vetDb.Appointments
                 .Where(appointment => appointment.ClientID == userId)
+                .AsQueryable()
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -150,7 +152,8 @@ namespace TermProjectBackend.Source.Svc
         public List<Appointment> GetUserAppointmentsWOPagination(int userId)
         {
             return _vetDb.Appointments
-                .Where(appointment => appointment.ClientID == userId)
+                .Where(a => a.ClientID == userId)
+                .AsQueryable()
                 .ToList();
         }
 

@@ -18,7 +18,7 @@ namespace TermProjectBackend.Context
         public virtual DbSet<User> Users { get; set; }
         public DbSet<Pet> Pets { get; set; }
 
-        public DbSet<Appointment> Appointments { get; set; }
+        public virtual DbSet<Appointment> Appointments { get; set; }
 
         public DbSet<VetStaff> VetStaff { get; set;}
 
