@@ -20,6 +20,7 @@ namespace TermProjectBackend.Source.Svc
 
             List<GetPetDTO> petDTOs = _vetDb.Pets
                 .Where(p => p.OwnerID == ownerId)
+                .AsQueryable()
                 .Select(p => new GetPetDTO
                 {
                     PetId = p.Id,
@@ -62,7 +63,7 @@ namespace TermProjectBackend.Source.Svc
 
         public bool IsPetUnique(String name)
         {
-            var pet = _vetDb.Pets.FirstOrDefault(p => p.Name == name);
+            var pet = _vetDb.Pets.Find(name);
 
             if (pet == null)
             {
@@ -74,7 +75,7 @@ namespace TermProjectBackend.Source.Svc
 
         public string GetPetNameById(int id)
         {
-            var pet = _vetDb.Pets.FirstOrDefault(p => p.Id == id);
+            var pet = _vetDb.Pets.Find(id);
 
             if (pet != null)
             {
