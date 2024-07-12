@@ -24,7 +24,7 @@ namespace TermProjectBackend.Context
 
         public virtual DbSet<Notification> Notification { get; set; }  
 
-        public DbSet<Item> Items { get; set; }
+        public virtual DbSet<Item> Items { get; set; }
 
         public DbSet<VaccinationRecord> VaccinationRecord {  get; set; }
 

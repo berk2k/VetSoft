@@ -54,7 +54,7 @@ namespace TermProjectBackend.Source.Svc
             //    throw new ArgumentException("Count cannot be lower than 0.");
             //}
 
-            var itemToUpdate = _vetDb.Items.FirstOrDefault(i => i.id == updateItemRequestDTO.id);
+            var itemToUpdate = _vetDb.Items.Find(updateItemRequestDTO.id);
 
             if (itemToUpdate != null)
             {
@@ -88,6 +88,7 @@ namespace TermProjectBackend.Source.Svc
                 //autocomplete
                 var items = _vetDb.Items
                 .Where(i => i.medicine_name.ToLower().Contains(medicineName))
+                .AsQueryable()
                 .ToList();
 
 
@@ -112,6 +113,7 @@ namespace TermProjectBackend.Source.Svc
         {
             var itemsWithZeroCount = _vetDb.Items
             .Where(i => i.count == 0)
+            .AsQueryable()
             .ToList();
 
             return itemsWithZeroCount;
