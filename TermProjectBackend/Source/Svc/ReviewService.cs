@@ -19,33 +19,29 @@ namespace TermProjectBackend.Source.Svc
         {
             return _vetDb.Reviews
                 .Skip((page - 1) * pageSize)
+                .AsQueryable()
                 .Take(pageSize)
                 .ToList();
         }
 
         public string GetPetNameById(int id)
         {
-            // Query the database to retrieve the pet name by ID
-            var pet = _vetDb.Pets.FirstOrDefault(p => p.Id == id);
+            var pet = _vetDb.Pets.Find(id);
 
-            // Check if a pet with the given ID exists
             if (pet != null)
             {
-                // Return the pet name
                 return pet.Name;
             }
             else
             {
-                // If no pet found with the given ID, throw an exception or return null, depending on your requirements
                 throw new ArgumentException("No pet found with the provided ID.");
-                // Alternatively, you can return null
-                // return null;
             }
         }
 
+
         public string GetUserNameById(int id)
         {
-            var user = _vetDb.Users.FirstOrDefault(u => u.Id == id);
+            var user = _vetDb.Users.Find(id);
 
             // Check if a user with the given ID exists
             if (user != null)
@@ -66,6 +62,7 @@ namespace TermProjectBackend.Source.Svc
         {
             return _vetDb.Reviews
                 .Where(review => review.userId == userId)
+                .AsQueryable()
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -75,37 +72,38 @@ namespace TermProjectBackend.Source.Svc
         {
             return _vetDb.Reviews
                 .Where(review => review.userId == userId)
+                .AsQueryable()
                 .ToList();
         }
 
         public Review SendReview(ReviewRequestDTO requestDTO)
         {
             DateTime utcNow = DateTime.UtcNow;
-            TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time"); // Türkiye'nin standart saat dilimi
+            TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time");
             DateTime trTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tzi);
 
-            if (!_vetDb.Pets.Any(p => p.Id == requestDTO.petId && p.OwnerID == requestDTO.userId))
+            // Check if the pet exists and belongs to the specified user
+            var pet = _vetDb.Pets.Find(requestDTO.petId);
+            if (pet == null || pet.OwnerID != requestDTO.userId)
             {
                 throw new InvalidOperationException("pet or user not found.");
             }
-            // Create a new Notification instance
+
             Review newReview = new Review
             {
                 message = requestDTO.message,
                 userId = requestDTO.userId,
                 petId = requestDTO.petId,
                 userName = GetUserNameById(requestDTO.userId),
-                petName = GetPetNameById(requestDTO.petId),
+                petName = pet.Name,
                 SentAt = trTime
             };
 
-            // Add the new notification to the Notifications DbSet
             _vetDb.Reviews.Add(newReview);
-
-            // Save changes to the database
             _vetDb.SaveChanges();
 
             return newReview;
         }
+
     }
 }

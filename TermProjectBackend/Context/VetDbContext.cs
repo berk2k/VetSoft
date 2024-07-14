@@ -20,15 +20,15 @@ namespace TermProjectBackend.Context
 
         public virtual DbSet<Appointment> Appointments { get; set; }
 
-        public DbSet<VetStaff> VetStaff { get; set;}
+        public virtual DbSet<VetStaff> VetStaff { get; set;}
 
         public virtual DbSet<Notification> Notification { get; set; }  
 
         public virtual DbSet<Item> Items { get; set; }
 
-        public DbSet<VaccinationRecord> VaccinationRecord {  get; set; }
+        public virtual DbSet<VaccinationRecord> VaccinationRecord {  get; set; }
 
-        public DbSet<Review> Reviews { get; set; }
+        public virtual DbSet<Review> Reviews { get; set; }
 
         public virtual DbSet<VeterinarianMessages> VeterinarianMessages { get; set; }
 
