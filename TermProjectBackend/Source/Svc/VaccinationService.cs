@@ -15,37 +15,33 @@ namespace TermProjectBackend.Source.Svc
 
         public VaccinationRecord AddVaccinationRecord(AddVaccinationRecordRequestDTO request)
         {
-            
+            var pet = _vetDb.Pets.Find(request.petId);
 
-            if (!_vetDb.Pets.Any(p => p.Id == request.petId && p.OwnerID == request.userId))
+            if (pet == null || pet.OwnerID != request.userId)
             {
                 throw new InvalidOperationException("pet or user not found.");
             }
 
-            
             var newRecord = new VaccinationRecord
             {
-
-                    userId = request.userId,
-                    petId = request.petId,
-                    petName = request.petName,
-                    vaccine_name = request.vaccine_name,
-                    vaccine_date = request.vaccine_date
-             
+                userId = request.userId,
+                petId = request.petId,
+                petName = request.petName,
+                vaccine_name = request.vaccine_name,
+                vaccine_date = request.vaccine_date
             };
 
+            _vetDb.VaccinationRecord.Add(newRecord);
+            _vetDb.SaveChanges();
 
-                _vetDb.VaccinationRecord.Add(newRecord);
-                _vetDb.SaveChanges();
-
-
-                return newRecord;
-            }
+            return newRecord;
+        }
 
         public List<GetVaccinationReportDTO> GetAllVaccinationHistoryForUser(int page, int pageSize, int id)
         {
             var vaccinationHistory = _vetDb.VaccinationRecord
                 .Where(v => v.userId == id)
+                .AsQueryable()
                 .Select(v => new GetVaccinationReportDTO
                 {
                     petName = v.petName,
@@ -64,6 +60,7 @@ namespace TermProjectBackend.Source.Svc
             {
                 var vaccinationHistory = _vetDb.VaccinationRecord
                 .Where(v => v.userId == id)
+                .AsQueryable()
                 .Select(v => new GetVaccinationReportDTO
                 {
                     petName = v.petName,
