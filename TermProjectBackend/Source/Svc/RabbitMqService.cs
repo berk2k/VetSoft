@@ -1,73 +1,95 @@
-﻿using Microsoft.AspNetCore.Connections;
+
 using Newtonsoft.Json;
+
 using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
-using System.Collections.Concurrent;
+
 using System.Text;
-using TermProjectBackend.Models;
 
-public class RabbitMqService
+
+namespace TermProjectBackend.Source.Svc
 {
-    private readonly IConnection _connection;
-    private readonly IModel _channel;
-    private const string ExchangeName = "direct_exchange";
-
-    public RabbitMqService()
+    public class RabbitMqService
     {
-        var factory = new ConnectionFactory()
+        private readonly IConnection _connection;
+        private IModel _channel;
+
+        private const string exchangeName = "notification_exchange";
+        private const string queueName = "notification_queue";
+        private const string routingKey = "notification_routing_key";
+
+        public RabbitMqService(IConnection connection)
         {
-            HostName = "localhost",
-            UserName = "guest",  // Kullanıcı adı
-            Password = "guest",  // Parola
-            Port = 5672          // Port
-        };
+            _connection = connection;
+            _channel = CreateOrGetChannel();
+            InitializeQueueAndExchange();
+        }
 
-        _connection = factory.CreateConnection();
-        _channel = _connection.CreateModel();
-
-        _channel.ExchangeDeclare(exchange: ExchangeName, type: ExchangeType.Fanout, durable: true);
-
-    }
-
-    public List<string> GetMessages(string queueName)
-    {
-        var messages = new List<string>();
-        var consumer = new EventingBasicConsumer(_channel);
-        
-
-        consumer.Received += (model, ea) =>
+        private void InitializeQueueAndExchange()
         {
-            var body = ea.Body.ToArray();
-            var message = Encoding.UTF8.GetString(body);
-            Console.WriteLine(message);
-            messages.Add(message);
-            
-
-            // Signal that we have received a message
-            
-        };
-
-        _channel.BasicConsume(queue: queueName,
-                             autoAck: true,
-                             consumer: consumer);
 
 
-        return messages;
-    }
 
-    public void SendMessageToRabbitMQ(string queueName, string message)
-    {
-        _channel.QueueDeclare(queue: queueName,
-                              durable: false,
-                              exclusive: false,
-                              autoDelete: false,
-                              arguments: null);
+            _channel.ExchangeDeclare(exchange: exchangeName, type: ExchangeType.Direct);
 
-        var body = Encoding.UTF8.GetBytes(message);
+            // declare queue (if not exists)
+            _channel.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
 
-        _channel.BasicPublish(exchange: ExchangeName,
-                              routingKey: queueName,
-                              basicProperties: null,
-                              body: body);
+            // bind queue with exchange
+            _channel.QueueBind(queue: queueName, exchange: exchangeName, routingKey: routingKey);
+        }
+
+
+        public void DeclareQueue(string queueName)
+        {
+            _channel.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
+        }
+
+
+        public void DeclareExchange(string exchangeName, string exchangeType)
+        {
+            _channel.ExchangeDeclare(exchange: exchangeName, type: exchangeType);
+        }
+
+
+        public void BindQueue(string queueName, string exchangeName, string routingKey)
+        {
+            _channel.QueueBind(queue: queueName, exchange: exchangeName, routingKey: routingKey);
+        }
+
+
+        public void PublishMessage<T>(T message)
+        {
+            var json = System.Text.Json.JsonSerializer.Serialize(message);
+            var body = Encoding.UTF8.GetBytes(json);
+
+            _channel.BasicPublish(exchange: exchangeName, routingKey: routingKey, basicProperties: null, body: body);
+        }
+
+
+        public string GetExchangeName()
+        {
+            return exchangeName;
+        }
+
+
+        public string GetRoutingKey()
+        {
+            return routingKey;
+        }
+
+
+        private IModel CreateOrGetChannel()
+        {
+            return _channel ?? (_channel = _connection.CreateModel());
+        }
+
+
+        public void CloseConnection()
+        {
+            _channel?.Close();
+            _connection?.Close();
+        }
     }
 }
+
+
