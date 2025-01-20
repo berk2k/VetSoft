@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send Message to Customer</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+      /* Custom CSS */
+      
+      #messageForm {
+          padding: 20px;
+          border: 1px solid #dee2e6;
+          border-radius: 8px;
+          background-color: #f8f9fa;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      #messageForm button {
+          display: block;
+          width: 100%;
+      }
+      #messageForm .form-control {
+          margin-bottom: 10px;
+          border-radius: 4px;
+      }
+      #messageForm .form-group {
+          margin-bottom: 20px;
+      }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <img src="/static/logo.png" alt="VetSoft" width="50" height="50">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">VetSoft</a>
+          </li>
+          {% if role == 'Admin' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/appointments">Appointments</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/message">Customer Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/stock">Check Stock</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/staff">Staff Management</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/review">Reviews</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/pet">Pets</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/vaccination">Vaccination</a>
+          </li>
+          {% endif %}
+          {% if role == 'Intern' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/pet">Pet</a>
+          </li>
+          {% endif %}
+          {% if role == 'Vet' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/appointments">Appointments</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/message">Customer Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/review">Reviews</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/pet">Pets</a>
+          </li>
+          {% endif %}
+          {% if role == 'Staff' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/stock">Check Stock</a>
+          </li>
+          {% endif %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {% if username %}
+              Welcome, {{ username }}
+              {% else %}
+              <p>Welcome, Guest</p>
+              {% endif %}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                  href="{{ url_for('logout') }}">Log out</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Are you sure to log out?</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <a class="btn btn-primary" href="{{ url_for('logout') }}">Log out</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-md-6">
+        <img src="https://static.vecteezy.com/system/resources/previews/000/963/033/non_2x/cartoon-business-man-sending-messages-vector.jpg" alt="Send Message" class="img-fluid">
+    </div>
+      <div class="col-md-6">
+        <h2 class="mb-4">Send Message to Customer</h2>
+            <form id="messageForm">
+                <div class="form-group">
+                    <label for="customerSelect" class="form-label">Select Customer:</label>
+                    <select class="form-control" id="customerSelect" name="customer">
+                        <option value="">Select a customer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="messageTextarea" class="form-label">Message:</label>
+                    <textarea class="form-control" id="messageTextarea" rows="4" placeholder="Enter your message"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </form>
+            <a class="btn btn-primary mt-3" href="/checkmessage">See Messages</a>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+      <div class="col-md-4 d-flex align-items-center">
+        <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
+          <img src="/static/logo.png" alt="VetSoft" width="30" height="30">
+        </a>
+        <span class="mb-3 mb-md-0 text-body-secondary">© 2024 VetSoft, Inc</span>
+      </div>
+
+      <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+        <li class="ms-3"><a class="text-body" href="#"><img src="/static/facebook.png" alt="Facebook" width="24"
+              height="24"></a></li>
+        <li class="ms-3"><a class="text-body" href="#"><img src="/static/instagram.png" alt="Instagram" width="24"
+              height="24"></a></li>
+        <li class="ms-3"><a class="text-body" href="#"><img src="/static/twitter.png" alt="X" width="24"
+              height="24"></a></li>
+      </ul>
+    </footer>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+
+  <script>
+    const baseURL = 'https://termprojectbackend.azurewebsites.net/api/';
+    $(document).ready(function () {
+      // Fetch user data from Flask backend
+      $.get('/get_users', function (data) {
+        // Populate the select element with the retrieved user data
+        var select = $('#customerSelect');
+        $.each(data, function (index, user) {
+          select.append('<option value="' + user + '">' + user + '</option>');
+        });
+      });
+    });
+    // Listen for form submission
+    document.getElementById('messageForm').addEventListener('submit', function (event) {
+      // Prevent the default form submission behavior
+
+      event.preventDefault();
+
+      // Get the username and message from the form
+      var username = document.getElementById('customerSelect').value;
+      var message = document.getElementById('messageTextarea').value;
+      console.log('message:', message);
+      console.log('username:', username);
+      var apiUrl = baseURL+'UserProfile/GetUserIdByUserName?userName=' + encodeURIComponent(username);
+      fetch(apiUrl, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => {
+          console.log('Response:', response); 
+          if (response.ok) {
+            return response.clone().json(); // Clone the response and parse as JSON
+          } else {
+            throw new Error('Failed to fetch user ID');
+          }
+        })
+        .then(data => {
+          console.log('User ID:', data); 
+          var sendNotificationUrl = baseURL+'Notification/SendNotification';
+          var notificationData = {
+            userId: data,
+            message: message 
+          };
+          fetch(sendNotificationUrl, {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'same-origin',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(notificationData)
+          })
+            .then(notificationResponse => {
+              if (notificationResponse.ok) {
+                console.log('Notification sent successfully.');
+                alert('Message sent successfully.');
+                // Handle success, if needed
+              } else {
+                throw new Error('Failed to send notification.');
+              }
+            })
+            .catch(notificationError => {
+              console.error('Error sending notification:', notificationError);
+            });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    });
+  </script>
+</body>
+</html>

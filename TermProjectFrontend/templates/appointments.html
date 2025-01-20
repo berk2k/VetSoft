@@ -1,0 +1,488 @@
+<!-- appointments.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appointments</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <img src="/static/logo.png" alt="VetSoft" width="50" height="50">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">VetSoft</a>
+          </li>
+          {% if role == 'Admin' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/appointments">Appointments</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/message">Customer Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/stock">Check Stock</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/staff">Staff Management</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/review">Reviews</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/pet">Pets</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/vaccination">Vaccination</a>
+          </li>
+          {% endif %}
+          {% if role == 'Intern' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/pet">Pet</a>
+          </li>
+          {% endif %}
+          {% if role == 'Vet' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/appointments">Appointments</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/message">Customer Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/review">Reviews</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/pet">Pets</a>
+          </li>
+          {% endif %}
+          {% if role == 'Staff' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/stock">Check Stock</a>
+          </li>
+          {% endif %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {% if username %}
+              Welcome, {{ username }}
+              {% else %}
+              <p>Welcome, Guest</p>
+              {% endif %}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                  href="{{ url_for('logout') }}">Log out</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Are you sure to log out?</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <a class="btn btn-primary" href="{{ url_for('logout') }}">Log out</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-md-6">
+        <img
+          src="https://static.vecteezy.com/system/resources/previews/021/687/591/large_2x/a-man-marking-deadline-day-employee-with-pencil-appointing-date-of-event-in-calendar-schedule-agenda-time-management-modern-flat-illustration-vector.jpg"
+          alt="Send Message" class="img-fluid">
+
+      </div>
+      <div class="col-md-6">
+        <div class="mb-3 row">
+          <label for="customerSelect" class="col-sm-2 col-form-label">Select Customer:</label>
+          <div class="col-sm-8">
+            <select class="form-select mt-3" id="customerSelect"></select>
+          </div>
+          <div class="col-sm-2">
+            <!-- Filter button -->
+            <button id="filterButton" class="btn btn-primary mt-3">Filter</button>
+          </div>
+        </div>
+
+        <table class="table table-hover table-bordered caption-top">
+          <caption>Appointments</caption>
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Time</th>
+              <th scope="col">Customer</th>
+              <th scope="col">Pet</th>
+              <th scope="col">Reason</th>
+            </tr>
+          </thead>
+          <tbody class="table-group-divider" id="appointmentsTableBody">
+            <!-- Table rows will be dynamically populated -->
+          </tbody>
+        </table>
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center" id="paginationControls">
+            <!-- Pagination controls will be added here -->
+          </ul>
+        </nav>
+
+        <!-- Add this label next to the input field -->
+        <!-- Add label and input field in the same row -->
+        <div class="row mb-3">
+          <label for="editTextInput" class="col-sm-7 col-form-label">Select a date and time to edit an
+            appointment:</label>
+          <div class="col-sm-5">
+            <input type="datetime-local" id="editTextInput" class="form-control">
+          </div>
+        </div>
+
+
+
+        <a class="btn btn-outline-primary" href="{{ url_for('addappointment') }}" data-bs-toggle="tooltip"
+          data-bs-placement="bottom" data-bs-title="Add an Appointment">
+          <img src="/static/add.png" alt="Add" style="width: 25px; height: 25px;">
+        </a>
+        <a class="btn btn-outline-secondary" data-bs-toggle="tooltip" data-bs-placement="bottom"
+          data-bs-title="Edit an Appointment" id="editAppointmentButton">
+          <img src="/static/edit.png" alt="Add" style="width: 25px; height: 25px;">
+        </a>
+        <a class="btn btn-outline-danger" data-bs-toggle="tooltip" data-bs-placement="bottom"
+          data-bs-title="Delete an Appointment" id="deleteAppointmentButton">
+          <img src="/static/delete.png" alt="Add" style="width: 25px; height: 25px;">
+        </a>
+        <!-- Add this input field inside your HTML markup, wherever appropriate -->
+
+      </div>
+    </div>
+  </div>
+
+  <div class="container mb-0 ">
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+      <div class="col-md-4 d-flex align-items-center">
+        <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
+          <img src="/static/logo.png" alt="VetSoft" width="30" height="30">
+        </a>
+        <span class="mb-3 mb-md-0 text-body-secondary">© 2024 VetSoft, Inc</span>
+      </div>
+
+      <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+        <li class="ms-3"><a class="text-body" href="#"><img src="/static/facebook.png" alt="Facebook" width="24"
+              height="24"></a></li>
+        <li class="ms-3"><a class="text-body" href="#"><img src="/static/instagram.png" alt="Instagram" width="24"
+              height="24"></a></li>
+        <li class="ms-3"><a class="text-body" href="#"><img src="/static/twitter.png" alt="X" width="24"
+              height="24"></a></li>
+      </ul>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+  <script>
+    const baseURL = 'https://termprojectbackend.azurewebsites.net/api/';
+    document.addEventListener('DOMContentLoaded', function () {
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+      // Event listener for customer selection
+      $.get('/get_users', function (data) {
+        var select = $('#customerSelect');
+        $.each(data, function (index, user) {
+          select.append('<option value="' + user + '">' + user + '</option>');
+        });
+      });
+    });
+    $(document).ready(function () {
+      // Event listener for filter button click
+      $('#filterButton').click(function () {
+        // Get the selected username from the dropdown
+        const selectedUsername = $('#customerSelect').val();
+
+        // Get the user ID corresponding to the selected username
+        getUserIdByUserName(selectedUsername)
+          .then(userId => {
+            // Call the filterAppointments function with the resolved user ID
+            filterAppointments(userId, 1); // Assuming page number is 1 for initial fetch
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+      });
+    });
+
+    // Function to get user ID by username
+    function getUserIdByUserName(username) {
+      return fetch(`/api/proxy?url=${baseURL}UserProfile/GetUserIdByUserName?userName=${username}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to get user ID');
+          }
+          return response.json();
+        });
+    }
+
+    // Function to filter appointments by user ID and page number
+    function filterAppointments(userId, page) {
+      fetch(`/api/proxy?url=${baseURL}Appointment/GetUserAppointments?page=${page}&userId=${userId}`)
+      .then(response => response.json())
+        .then(data => {
+          // Clear existing table rows
+          const appointmentsTableBody = document.getElementById('appointmentsTableBody');
+          appointmentsTableBody.innerHTML = '';
+
+          // Populate the table with data
+          data.forEach(appointment => {
+            const selectedUsername = $('#customerSelect').val();
+            const row = document.createElement('tr');
+            row.dataset.appointmentId = appointment.appointmentId;
+
+            // Parse appointment date and time
+            const appointmentDateTime = new Date(appointment.appointmentDateTime);
+            const date = appointmentDateTime.toLocaleDateString();
+            const time = appointmentDateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            // Create cells for date, time, customer, and reason
+            const dateCell = document.createElement('td');
+            dateCell.innerText = date;
+            row.appendChild(dateCell);
+
+            const timeCell = document.createElement('td');
+            timeCell.innerText = time;
+            row.appendChild(timeCell);
+
+            const customerCell = document.createElement('td');
+            customerCell.innerText = selectedUsername;
+            console.log("customerCell.innerText",customerCell.innerText)
+            row.appendChild(customerCell);
+
+
+            const petCell = document.createElement('td');
+            petCell.innerText = appointment.petName;
+            console.log("customerCell.innerText",petCell.innerText)
+            row.appendChild(petCell);
+
+            const reasonCell = document.createElement('td');
+            reasonCell.innerText = appointment.reasons;
+            row.appendChild(reasonCell);
+
+            // Append the row to the table
+            appointmentsTableBody.appendChild(row);
+          });
+        })
+        .catch(error => console.error('Error fetching appointment data:', error));
+    }
+    // Event listener to handle delete button click
+    document.getElementById('deleteAppointmentButton').addEventListener('click', function () {
+      // Check if an appointment is selected
+      if (selectedAppointmentId) {
+        deleteAppointment(selectedAppointmentId);
+      } else {
+        console.log('No appointment selected.');
+      }
+    });
+
+
+    let currentPage = 1; // Initialize current page number
+    let selectedAppointmentId = null; // Initialize selected appointment ID as null
+
+    // Function to handle row selection
+    function handleRowSelection(appointmentId) {
+      selectedAppointmentId = appointmentId;
+
+      // Enable edit and delete buttons
+      document.getElementById('editAppointmentButton').disabled = false;
+      document.getElementById('deleteAppointmentButton').disabled = false;
+
+      // Highlight the selected row (optional)
+      const rows = document.querySelectorAll('#appointmentsTableBody tr');
+      rows.forEach(row => {
+        if (row.dataset.appointmentId === appointmentId) {
+          row.classList.add('table-primary');
+        } else {
+          row.classList.remove('table-primary');
+        }
+      });
+    }
+
+    // Function to update the appointment
+    function updateAppointment() {
+      const appointmentId = selectedAppointmentId; // Get the selected appointment ID
+      const newAppointmentDateTime = document.getElementById('editTextInput').value; // Get the new appointment date/time from the input field
+
+      const requestBody = {
+        id: appointmentId,
+        appointmentDateTime: newAppointmentDateTime
+      };
+
+      fetch(baseURL+'Appointment/Update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      })
+        .then(response => {
+          if (response.ok) {
+            // Appointment updated successfully
+            console.log('Appointment updated successfully');
+            // Show the edit text input again (assuming the input has an ID of 'editTextInput')
+            document.getElementById('editTextInput').style.display = 'block';
+            // Optionally, you can update the table to reflect the changes
+            fetchAppointments(currentPage);
+          } else {
+            // Handle errors
+            console.error('Failed to update appointment:', response.statusText);
+          }
+        })
+        .catch(error => console.error('Error updating appointment:', error));
+    }
+    // Event listener to handle delete button click
+    document.getElementById('deleteAppointmentButton').addEventListener('click', function () {
+      // Check if an appointment is selected
+      if (selectedAppointmentId) {
+        deleteAppointment(selectedAppointmentId);
+      } else {
+        console.log('No appointment selected.');
+      }
+    });
+    // Event listener to handle delete button click
+    document.getElementById('editAppointmentButton').addEventListener('click', function () {
+      // Check if an appointment is selected
+      if (selectedAppointmentId) {
+        updateAppointment();
+      } else {
+        console.log('No appointment selected.');
+      }
+    });
+    // Function to delete the appointment
+    function deleteAppointment(appointmentId) {
+      fetch(`/api/proxy?url=${baseURL}Appointment/Delete?id=${appointmentId}`, {
+        method: 'DELETE'
+      })
+        .then(response => {
+          if (response.ok) {
+            // Appointment deleted successfully
+            alert('Appointment deleted successfully');
+            // Optionally, you can update the table to reflect the changes
+            fetchAppointments(currentPage);
+          } else {
+            // Handle errors
+            console.error('Failed to delete appointment:', response.statusText);
+          }
+        })
+        .catch(error => console.error('Error deleting appointment:', error));
+    }
+
+    // Function to fetch appointment data based on page number
+    function fetchAppointments(page) {
+      fetch(`/api/proxy?url=${baseURL}Appointment/GetAllAppointments?page=${page}`)
+        .then(response => response.json())
+        .then(data => {
+          // Clear existing table rows
+          const appointmentsTableBody = document.getElementById('appointmentsTableBody');
+          appointmentsTableBody.innerHTML = '';
+
+          // Populate the table with data
+          data.forEach(appointment => {
+            const row = document.createElement('tr');
+            row.dataset.appointmentId = appointment.appointmentId;
+
+            // Parse appointment date and time
+            const appointmentDateTime = new Date(appointment.appointmentDateTime);
+            const date = appointmentDateTime.toLocaleDateString();
+            const time = appointmentDateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            // Create cells for date, time, customer, and reason
+            const dateCell = document.createElement('td');
+            dateCell.innerText = date;
+            row.appendChild(dateCell);
+
+            const timeCell = document.createElement('td');
+            timeCell.innerText = time;
+            row.appendChild(timeCell);
+
+            const customerCell = document.createElement('td');
+            customerCell.innerText = appointment.clientName;
+            row.appendChild(customerCell);
+
+            const petCell = document.createElement('td');
+            petCell.innerText = appointment.petName;
+            row.appendChild(petCell);
+
+            const reasonCell = document.createElement('td');
+            reasonCell.innerText = appointment.reasons;
+            row.appendChild(reasonCell);
+
+            // Append the row to the table
+            appointmentsTableBody.appendChild(row);
+          });
+        })
+        .catch(error => console.error('Error fetching appointment data:', error));
+    }
+    // Event listener to handle row selection
+    document.getElementById('appointmentsTableBody').addEventListener('click', function (event) {
+      const target = event.target;
+      if (target.tagName === 'TD') {
+        const appointmentId = target.closest('tr').dataset.appointmentId;
+        console.log("Clicked appointment ID:", appointmentId);
+        handleRowSelection(appointmentId);
+      }
+    });
+    // Function to change the page and fetch appointments for the new page
+    function changePage(page) {
+      currentPage = page;
+      fetchAppointments(currentPage);
+    }
+
+    // Initial fetch when the page loads
+    fetchAppointments(currentPage);
+
+    function createPaginationControls(totalPages) {
+      const paginationControls = document.getElementById('paginationControls');
+      paginationControls.innerHTML = '';
+      for (let i = 1; i <= totalPages; i++) {
+        const pageButton = document.createElement('li');
+        pageButton.classList.add('page-item');
+        const pageButtonLink = document.createElement('a');
+        pageButtonLink.classList.add('page-link');
+        pageButtonLink.innerText = i;
+        pageButtonLink.href = '#';
+        pageButtonLink.addEventListener('click', () => {
+          changePage(i);
+        });
+        pageButton.appendChild(pageButtonLink);
+        paginationControls.appendChild(pageButton);
+      }
+
+    }
+
+    // Example: Calculate total pages based on total items or fetch from API
+    const totalPages = 5; // For example, you can calculate this based on total items or fetch from API
+    createPaginationControls(totalPages);
+  </script>
+</body>
+
+</html>

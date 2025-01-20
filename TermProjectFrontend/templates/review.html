@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Message to Customer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        /* Custom CSS */
+
+        #messageForm {
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #messageForm button {
+            display: block;
+            width: 100%;
+        }
+
+        #messageForm .form-control {
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        #messageForm .form-group {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="/static/logo.png" alt="VetSoft" width="50" height="50">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">VetSoft</a>
+                    </li>
+                    {% if role == 'Admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/appointments">Appointments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/message">Customer Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/stock">Check Stock</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/staff">Staff Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/review">Reviews</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pet">Pets</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/vaccination">Vaccination</a>
+                    </li>
+                    {% endif %}
+                    {% if role == 'Intern' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pet">Pet</a>
+                    </li>
+                    {% endif %}
+                    {% if role == 'Vet' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/appointments">Appointments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/message">Customer Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/review">Reviews</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pet">Pets</a>
+                    </li>
+                    {% endif %}
+                    {% if role == 'Staff' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/stock">Check Stock</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            {% if username %}
+                            Welcome, {{ username }}
+                            {% else %}
+                            <p>Welcome, Guest</p>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                    href="{{ url_for('logout') }}">Log out</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Are you sure to log out?</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="{{ url_for('logout') }}">Log out</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <img src="https://static.vecteezy.com/system/resources/previews/000/480/902/large_2x/vet-clinic-flat-orthogonal-poster-vector.jpg"
+                    alt="Review" class="img-fluid">
+            </div>
+            <div class="col-md-6">
+                <h2 class="mb-4">Review</h2>
+                <form id="reviewForm">
+                    <div class="mb-3">
+                        <label for="datetimePicker" class="form-label">Date and Time:</label>
+                        <input type="text" class="form-control" id="datetimePicker" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerSelect" class="form-label">Select Customer:</label>
+                        <select class="form-select" id="customerSelect"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="petSelect" class="form-label">Select Pet:</label>
+                        <select class="form-select" id="petSelect"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reviewTextarea" class="form-label">Review:</label>
+                        <textarea class="form-control" id="reviewTextarea" rows="3"></textarea>
+                    </div>
+    
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center mt-3">
+                <h2 class="mb-4">Reviews</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>User name</th>
+                            <th>Pet name</th>
+                            <th>Review</th>
+                            <th>Sent At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reviewsTable">
+                        <!-- Table rows will be dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Are you sure to log out?</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="{{ url_for('logout') }}">Log out</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+            <div class="col-md-4 d-flex align-items-center">
+                <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
+                    <img src="/static/logo.png" alt="VetSoft" width="30" height="30">
+                </a>
+                <span class="mb-3 mb-md-0 text-body-secondary">© 2024 VetSoft, Inc</span>
+            </div>
+            <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+                <li class="ms-3"><a class="text-body" href="#"><img src="/static/facebook.png" alt="Facebook" width="24"
+                            height="24"></a></li>
+                <li class="ms-3"><a class="text-body" href="#"><img src="/static/instagram.png" alt="Instagram"
+                            width="24" height="24"></a></li>
+                <li class="ms-3"><a class="text-body" href="#"><img src="/static/twitter.png" alt="X" width="24"
+                            height="24"></a></li>
+            </ul>
+        </footer>
+    </div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+    <script>
+        const baseURL = 'https://termprojectbackend.azurewebsites.net/api/';
+        $(document).ready(function () {
+            let petId = 0;
+            // Function to format date string
+            function formatDateTime(dateTimeString) {
+                var dateTime = new Date(dateTimeString);
+                var formattedDate = dateTime.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                var formattedTime = dateTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                return formattedDate + ' ' + formattedTime;
+            }
+
+            // Example usage
+            var datetime = new Date().toISOString();
+            var dateTimeString = datetime;
+            var formattedDateTime = formatDateTime(dateTimeString);
+            console.log(formattedDateTime); // Output: 14.05.2024 21:45
+            // Get current date and time in ISO format
+            // Set the value of the date and time input field
+            $('#datetimePicker').val(formattedDateTime);
+            // Function to get customer ID based on username
+            function getCustomerId(username) {
+                return $.get(baseURL + 'UserProfile/GetUserIdByUserName', { userName: username });
+            }
+
+            // Function to get pet names based on customer ID
+            function getPetNames(customerId) {
+                return $.get(baseURL + 'GetPet/' + customerId);
+            }
+
+            // Fetch user data from Flask backend
+            $.get('/get_users', function (data) {
+                // Populate the select element with the retrieved user data
+                var select = $('#customerSelect');
+                $.each(data, function (index, user) {
+                    select.append('<option value="' + user + '">' + user + '</option>');
+                });
+            });
+
+            // Event listener for customer selection change
+            $('#customerSelect').change(function () {
+                var username = $(this).val();
+                // Get customer ID based on selected username
+                getCustomerId(username)
+                    .done(function (customerId) {
+                        // Fetch pet names for the selected customer ID from the API
+                        getPetNames(customerId)
+                            .done(function (data) {
+                                // Check if data is an array, if not, convert to array
+                                var petData = Array.isArray(data) ? data : [data];
+                                // Populate the pet select element with the retrieved pet names
+                                var petSelect = $('#petSelect');
+                                petSelect.empty(); // Clear existing options
+                                if (petData.length > 0) {
+                                    $.each(petData, function (index, pet) {
+                                        petSelect.append('<option value="' + pet.name + '">' + pet.name + '</option>');
+                                    });
+                                } else {
+                                    // No pets found, clear the pet dropdown
+                                    petSelect.append('<option value="">No pets found</option>');
+                                }
+                            })
+                            .fail(function () {
+                                console.error('Failed to get pet names');
+                            });
+                    })
+                    .fail(function () {
+                        console.error('Failed to get customer ID');
+                    });
+            });
+
+            // Event listener for form submission
+            $('#reviewForm').submit(function (event) {
+                event.preventDefault();
+                // Get the username, review, and selected pet name from the form
+                var username = $('#customerSelect').val();
+                var review = $('#reviewTextarea').val();
+                var petName = $('#petSelect').val();
+
+                // Get customer ID based on selected username
+                getCustomerId(username)
+                    .done(function (customerId) {
+                        // Get pet names for the selected customer ID from the API
+                        getPetNames(customerId)
+                            .done(function (data) {
+                                var petId;
+                                // Find the pet ID based on the selected pet name
+                                data.forEach(function (pet) {
+                                    if (pet.name === petName) {
+                                        petId = pet.id;
+                                    }
+                                });
+                                if (petId) {
+                                    // Send review request
+                                    var sendReviewUrl = baseURL + 'Review/SendReview';
+                                    var reviewData = {
+                                        userId: customerId,
+                                        petId: petId,
+                                        message: review,
+                                        datetime: datetime
+                                    };
+                                    fetch(sendReviewUrl, {
+                                        method: 'POST',
+                                        mode: 'cors',
+                                        credentials: 'same-origin',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify(reviewData)
+                                    })
+                                        .then(response => {
+                                            if (response.ok) {
+                                                console.log('Review sent successfully.');
+                                                alert('Review sent successfully.');
+                                                // Handle success, if needed
+                                            } else {
+                                                throw new Error('Failed to send review.');
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Error sending review:', error);
+                                        });
+                                } else {
+                                    console.error('Pet ID not found');
+                                }
+                            })
+                            .fail(function () {
+                                console.error('Failed to get pet names');
+                            });
+                    })
+                    .fail(function () {
+                        console.error('Failed to get customer ID');
+                    });
+            });
+
+
+            // Function to populate the reviews table
+            function populateReviewsTable(page) {
+                $.get(baseURL + `Review/GetAllReviews?page=${page}`, function (data) {
+                    const reviewsTable = $('#reviewsTable');
+                    reviewsTable.empty(); // Clear existing rows
+                    data.forEach(function (review) {
+                        const formattedDateTime = formatDateTime(review.sentAt);
+                        reviewsTable.append('<tr><td>' + review.userName + '</td><td>' + review.petName + '</td><td>' + review.message + '</td><td>' + formattedDateTime + '</td></tr>');
+                    });
+                });
+            }
+
+            // Call populateReviewsTable function with page 1 initially
+            populateReviewsTable(1);
+
+        });
+
+    </script>
+</body>
+
+</html>

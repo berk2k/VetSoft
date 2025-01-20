@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Message to Customer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        /* Custom CSS */
+
+        #messageForm {
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #messageForm button {
+            display: block;
+            width: 100%;
+        }
+
+        #messageForm .form-control {
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        #messageForm .form-group {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="/static/logo.png" alt="VetSoft" width="50" height="50">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">VetSoft</a>
+                    </li>
+                    {% if role == 'Admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/appointments">Appointments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/message">Customer Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/stock">Check Stock</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/staff">Staff Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/review">Reviews</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pet">Pets</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/vaccination">Vaccination</a>
+                    </li>
+                    {% endif %}
+                    {% if role == 'Intern' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pet">Pet</a>
+                    </li>
+                    {% endif %}
+                    {% if role == 'Vet' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/appointments">Appointments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/message">Customer Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/review">Reviews</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pet">Pets</a>
+                    </li>
+                    {% endif %}
+                    {% if role == 'Staff' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/stock">Check Stock</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            {% if username %}
+                            Welcome, {{ username }}
+                            {% else %}
+                            <p>Welcome, Guest</p>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                    href="{{ url_for('logout') }}">Log out</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <img src="https://static.vecteezy.com/system/resources/previews/000/963/033/non_2x/cartoon-business-man-sending-messages-vector.jpg"
+                    alt="Send Message" class="img-fluid">
+            </div>
+            <div class="col-md-6">
+                <h2 class="mb-4">See the messages</h2>
+                <form id="messageForm">
+                    <div class="form-group">
+                        <label for="customerSelect" class="form-label">Select Customer:</label>
+                        <select class="form-control" id="customerSelect" name="customer">
+                            <option value="">Select a customer</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Select</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <h2 class="mb-4">Sent Messages</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Message</th>
+                            <th>Sent At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sentMessagesTable">
+                        <!-- Table rows will be dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h2 class="mb-4">Received Messages</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Message</th>
+                            <th>Sent At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="receivedMessagesTable">
+                        <!-- Table rows will be dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+            <div class="col-md-4 d-flex align-items-center">
+                <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
+                    <img src="/static/logo.png" alt="VetSoft" width="30" height="30">
+                </a>
+                <span class="mb-3 mb-md-0 text-body-secondary">© 2024 VetSoft, Inc</span>
+            </div>
+
+            <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+                <li class="ms-3"><a class="text-body" href="#"><img src="/static/facebook.png" alt="Facebook" width="24"
+                            height="24"></a></li>
+                <li class="ms-3"><a class="text-body" href="#"><img src="/static/instagram.png" alt="Instagram"
+                            width="24" height="24"></a></li>
+                <li class="ms-3"><a class="text-body" href="#"><img src="/static/twitter.png" alt="X" width="24"
+                            height="24"></a></li>
+            </ul>
+        </footer>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+    <script>
+        const baseURL = 'https://termprojectbackend.azurewebsites.net/api/';
+
+        // Function to populate the sent messages table
+        function populateSentMessages(userId) {
+            const sentMessagesTable = $('#sentMessagesTable');
+            sentMessagesTable.empty(); // Clear previous table data
+            fetch(baseURL + `Notification/GetNotificationHistoryForUserWOPagination?userId=${userId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch sent messages');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    data.forEach(notification => {
+                        // Create table row for each notification
+                        const row = $('<tr>');
+                        // Convert ISO date string to a readable format
+                        const sentAt = new Date(notification.sentAt).toLocaleString();
+                        console.log("sentAt",sentAt);
+                        row.append($('<td>').text(notification.message)); // Add message column
+                        row.append($('<td>').text(sentAt)); // Add sentAt column
+                        sentMessagesTable.append(row); // Append row to table
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching sent messages:', error);
+                });
+        }
+
+        // Function to fetch and populate received messages
+        function populateReceivedMessages(userId) {
+            fetch(baseURL + `Notification/GetNotificationHistoryForVet?userId=${userId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch received messages');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const receivedMessagesTable = $('#receivedMessagesTable');
+                    receivedMessagesTable.empty(); // Clear existing rows
+                    data.forEach(message => {
+                        // Ensure that 'message' object has the correct properties
+                        // Convert ISO date string to a readable format
+                        const sentAt = new Date(message.sentAt).toLocaleString();
+                        receivedMessagesTable.append('<tr><td>' + message.messageTitle + '</td><td>' + message.messageText + '</td><td>' + sentAt + '</td></tr>');
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching received messages:', error);
+                });
+        }
+
+
+
+        $(document).ready(function () {
+            // Fetch user data from Flask backend
+            $.get('/get_users', function (data) {
+                // Populate the select element with the retrieved user data
+                var select = $('#customerSelect');
+                $.each(data, function (index, user) {
+                    select.append('<option value="' + user + '">' + user + '</option>');
+                });
+            });
+
+            // Function to get user ID by username
+            function getUserIdByUserName(username) {
+                return fetch(baseURL + `UserProfile/GetUserIdByUserName?userName=${username}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to get user ID');
+                        }
+                        return response.json();
+                    });
+            }
+
+            // Event listener for form submission
+            $('#messageForm').submit(function (event) {
+                event.preventDefault(); // Prevent default form submission
+                const selectedUser = $('#customerSelect').val(); // Get selected user
+                // Get user ID by username
+                getUserIdByUserName(selectedUser)
+                    .then(userId => {
+                        // Populate sent and received messages tables with the corresponding user ID
+                        populateSentMessages(userId);
+                        populateReceivedMessages(userId);
+                    })
+                    .catch(error => {
+                        console.error('Error getting user ID:', error);
+                    });
+            });
+        });
+
+
+    </script>
+</body>
+
+</html>
