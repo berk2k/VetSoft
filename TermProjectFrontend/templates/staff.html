@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Members</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <img src="/static/logo.png" alt="VetSoft" width="50" height="50">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">VetSoft</a>
+          </li>
+          {% if role == 'Admin' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/appointments">Appointments</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/message">Customer Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/stock">Check Stock</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/staff">Staff Management</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/review">Reviews</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/pet">Pets</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/vaccination">Vaccination</a>
+          </li>
+          {% endif %}
+          {% if role == 'Intern' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/pet">Pet</a>
+          </li>
+          {% endif %}
+          {% if role == 'Vet' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/appointments">Appointments</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/message">Customer Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/review">Reviews</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/pet">Pets</a>
+          </li>
+          {% endif %}
+          {% if role == 'Staff' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/stock">Check Stock</a>
+          </li>
+          {% endif %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {% if username %}
+              Welcome, {{ username }}
+              {% else %}
+              <p>Welcome, Guest</p>
+              {% endif %}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                  href="{{ url_for('logout') }}">Log out</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Are you sure to log out?</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <a class="btn btn-primary" href="{{ url_for('logout') }}">Log out</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-md-6">
+        <img
+          src="https://static.vecteezy.com/system/resources/previews/038/825/980/large_2x/company-employees-talking-about-boss-tasks-sitting-with-laptop-concept-flat-illustration-vector.jpg"
+          alt="Send Message" class="img-fluid">
+      </div>
+      <div class="col-md-6">
+        <h1>Staff Members</h1>
+        <table class="table">
+          <thead class="thead-dark">
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody id="staffTable">
+            <!-- Table rows will be dynamically populated -->
+          </tbody>
+        </table>
+        <!-- Pagination controls -->
+        <div id="paginationControls">
+          <button id="prevButton" class="btn btn-secondary" onclick="changePage('prev')">Previous</button>
+          <button id="nextButton" class="btn btn-secondary" onclick="changePage('next')">Next</button>
+        </div>
+
+        <div class="row mb-3 mt-4">
+          <label for="editnameTextInput" class="col-sm-7 col-form-label">Enter a new name:</label>
+          <div class="col-sm-5">
+            <input id="editnameTextInput" class="form-control border border-primary">
+          </div>
+
+        </div>
+        <div class="row mb-3 mt-4">
+          <label for="editTextInput" class="col-sm-7 col-form-label">Enter a new password:</label>
+          <div class="col-sm-5">
+            <input id="editTextInput" type="" class="form-control border border-primary">
+          </div>
+        </div>
+
+        <a class="btn btn-outline-primary mt-4" href="{{ url_for('addstaff') }}" data-bs-toggle="tooltip"
+          data-bs-placement="bottom" data-bs-title="Add Staff">
+          <img src="/static/add.png" alt="Add" style="width: 25px; height: 25px;">
+        </a>
+        <a class="btn btn-outline-secondary mt-4" data-bs-toggle="tooltip" data-bs-placement="bottom"
+          data-bs-title="Edit Staff">
+          <img src="/static/edit.png" alt="Add" style="width: 25px; height: 25px;" id="editStaffButton">
+        </a>
+        <a class="btn btn-outline-danger mt-4" data-bs-toggle="tooltip" data-bs-placement="bottom"
+          data-bs-title="Delete Staff">
+          <img src="/static/delete.png" alt="Add" style="width: 25px; height: 25px;" id="deleteStaffButton">
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="container">
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+      <div class="col-md-4 d-flex align-items-center">
+        <a href="/" class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1">
+          <img src="/static/logo.png" alt="VetSoft" width="30" height="30">
+        </a>
+        <span class="mb-3 mb-md-0 text-body-secondary">© 2024 VetSoft, Inc</span>
+      </div>
+
+      <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+        <li class="ms-3"><a class="text-body" href="#"><img src="/static/facebook.png" alt="Facebook" width="24"
+              height="24"></a></li>
+        <li class="ms-3"><a class="text-body" href="#"><img src="/static/instagram.png" alt="Instagram" width="24"
+              height="24"></a></li>
+        <li class="ms-3"><a class="text-body" href="#"><img src="/static/twitter.png" alt="X" width="24"
+              height="24"></a></li>
+      </ul>
+    </footer>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+  <script>
+    const baseURL = 'https://termprojectbackend.azurewebsites.net/api/';
+    document.addEventListener('DOMContentLoaded', function () {
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    });
+    let currentPage = 1; // Current page number
+
+    // Function to fetch data from the API and populate the table
+    function fetchData(page) {
+      const url = baseURL+'VetStaff/GetAllVetStaff?page=' + page;
+      fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch data');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Clear existing table rows
+          const staffTable = document.getElementById('staffTable');
+          staffTable.innerHTML = '';
+
+          // Populate the table with data
+          data.forEach(staff => {
+            const row = document.createElement('tr');
+            row.setAttribute('data-staff-id', staff.staffId);
+
+            // Create cells for staff ID, name, email, and role
+            const idCell = document.createElement('td');
+            idCell.innerText = staff.staffId;
+            row.appendChild(idCell);
+
+            const nameCell = document.createElement('td');
+            nameCell.innerText = staff.name;
+            row.appendChild(nameCell);
+
+            const emailCell = document.createElement('td');
+            emailCell.innerText = staff.email;
+            row.appendChild(emailCell);
+
+            const roleCell = document.createElement('td');
+            roleCell.innerText = staff.role;
+            row.appendChild(roleCell);
+
+            // Append the row to the table
+            staffTable.appendChild(row);
+          });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+    $(document).ready(function () {
+
+      fetchData(currentPage);
+      // Function to change the current page and fetch data accordingly
+      function changePage(direction) {
+        if (direction === 'next') {
+          currentPage++;
+        } else if (direction === 'prev' && currentPage > 1) {
+          currentPage--;
+        }
+
+        // Fetch data with the new page number
+        fetchData(currentPage);
+      }
+
+      // Pagination controls
+      $('#prevButton').click(function () {
+        changePage('prev');
+      });
+
+      $('#nextButton').click(function () {
+        changePage('next');
+      });
+
+      // Initial fetch when the page loads
+      fetchData(currentPage);
+    });
+
+    function handleRowSelection(staffId) {
+      // Remove the 'table-primary' class from all rows
+      const rows = document.querySelectorAll('#staffTable tr');
+      rows.forEach(row => {
+        row.classList.remove('table-primary');
+      });
+
+      // Highlight the selected row
+      const selectedRow = document.querySelector(`#staffTable tr[data-staff-id="${staffId}"]`);
+      if (selectedRow) {
+        selectedRow.classList.add('table-primary');
+
+        // Populate the input fields with the selected staff's data
+        const nameInput = document.getElementById('editnameTextInput');
+        nameInput.value = selectedRow.cells[1].innerText;
+
+        const passwordInput = document.getElementById('editTextInput');
+        passwordInput.value = ''; // Clear the password input field
+      }
+    }
+
+    // Function to update staff
+    document.getElementById('editStaffButton').addEventListener('click', function () {
+      const selectedRow = document.querySelector('#staffTable tr.table-primary');
+      if (selectedRow) {
+        const staffId = selectedRow.dataset.staffId;
+        const newName = document.getElementById('editnameTextInput').value;
+        if (newName == "") {
+          newName = selectedRow.dataset.itemName;
+        }
+        const newPassword = document.getElementById('editTextInput').value;
+        const updateUrl = baseURL+'VetStaff/update';
+
+        // Prepare data for updating
+        const updateData = {
+          id: staffId,
+          name: newName,
+          password: newPassword
+        };
+
+        // Send update request
+        fetch(updateUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updateData)
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Updated successfully:', data);
+            fetchData(currentPage);
+          })
+          .catch(error => {
+            console.error('Error updating staff:', error);
+          });
+      } else {
+        alert('Please select an staff to update.');
+      }
+    });
+
+    // Function to delete staff member
+    function deleteStaff() {
+      if (confirm('Are you sure you want to delete this staff?')) {
+        const selectedRow = document.querySelector('#staffTable tr.table-primary');
+        if (selectedRow) {
+          const staffId = selectedRow.dataset.staffId;
+          const deleteUrl = baseURL+'VetStaff/DeleteStaff';
+
+          // Prepare data for deletion
+          const deleteData = {
+            id: staffId
+          };
+
+          // Send delete request
+          fetch(deleteUrl, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(deleteData)
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to delete staff');
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log('Staff deleted successfully:', data);
+              // Refresh the table after deletion
+              fetchData(currentPage);
+            })
+            .catch(error => {
+              console.error('Error deleting staff:', error);
+            });
+        } else {
+          alert('Please select a staff member to delete.');
+        }
+      }
+
+    }
+
+    // Event listener for delete button
+    document.getElementById('deleteStaffButton').addEventListener('click', deleteStaff);
+
+    // Event listener to handle row selection
+    document.getElementById('staffTable').addEventListener('click', function (event) {
+      const target = event.target;
+      if (target.tagName === 'TD') {
+        const staffId = target.closest('tr').dataset.staffId;
+        console.log("Clicked staff ID:", staffId);
+        handleRowSelection(staffId);
+      }
+    });
+
+  </script>
+</body>
+
+</html>
