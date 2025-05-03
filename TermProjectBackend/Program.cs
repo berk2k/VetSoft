@@ -37,6 +37,7 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IVaccinationService, VaccinationService>();
 
+builder.Services.AddSingleton<RabbitMqService>();
 
 
 // CORS configuration
