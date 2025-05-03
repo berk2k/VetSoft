@@ -10,6 +10,19 @@ using TermProjectBackend.Source.Svc;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders(); 
+builder.Logging.AddConsole(); 
+builder.Logging.AddDebug();
+
+
+
+builder.Logging.SetMinimumLevel(LogLevel.Information);
+
+
+builder.Logging.AddFilter("Microsoft", LogLevel.Warning);
+builder.Logging.AddFilter("System", LogLevel.Warning);
+builder.Logging.AddFilter("TermProjectBackend.Source.Svc", LogLevel.Debug);
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -24,7 +37,7 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IVaccinationService, VaccinationService>();
 
-builder.Services.AddSingleton<RabbitMqService>();
+
 
 // CORS configuration
 builder.Services.AddCors(options =>
@@ -74,26 +87,26 @@ builder.Services.AddSwaggerGen(options =>
 
 });
 
-var key = builder.Configuration.GetValue<string>("ApiSettings:Secret");
+//var key = builder.Configuration.GetValue<string>("ApiSettings:Secret");
 
-builder.Services.AddAuthentication(x =>
-{
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(x =>
-{
-    x.RequireHttpsMetadata = false;
-    x.SaveToken = true;
-    x.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
-        ValidateIssuer = false,
-        ValidateAudience = false
+//builder.Services.AddAuthentication(x =>
+//{
+//    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//}).AddJwtBearer(x =>
+//{
+//    x.RequireHttpsMetadata = false;
+//    x.SaveToken = true;
+//    x.TokenValidationParameters = new TokenValidationParameters
+//    {
+//        ValidateIssuerSigningKey = true,
+//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
+//        ValidateIssuer = false,
+//        ValidateAudience = false
 
-    };
+//    };
 
-});
+//});
 builder.Services.AddDbContext<VetDbContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection"));

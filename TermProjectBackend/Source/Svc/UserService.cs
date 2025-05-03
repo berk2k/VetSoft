@@ -11,12 +11,12 @@ namespace TermProjectBackend.Source.Svc
     public class UserService : IUserService
     {
         private readonly VetDbContext _vetDb;
-        private string secretKey;
+        //private string secretKey;
 
         public UserService(VetDbContext vetDb, IConfiguration configuration)
         {
             _vetDb = vetDb;
-            secretKey = configuration.GetValue<string>("ApiSettings:Secret");
+            //secretKey = configuration.GetValue<string>("ApiSettings:Secret");
             
         }
 
@@ -81,28 +81,28 @@ namespace TermProjectBackend.Source.Svc
                 };
             }
 
-            var tokenHandler = new JwtSecurityTokenHandler();
+            //var tokenHandler = new JwtSecurityTokenHandler();
 
-            var key = Encoding.ASCII.GetBytes(secretKey);
+            //var key = Encoding.ASCII.GetBytes(secretKey);
 
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim("UserId", user.Id.ToString()),
-                    new Claim(ClaimTypes.Name,user.Id.ToString()),
-                    new Claim(ClaimTypes.Role,user.Role)
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(15),
-                SigningCredentials = new(new SymmetricSecurityKey(key),SecurityAlgorithms.HmacSha256Signature)
-            };
+            //var tokenDescriptor = new SecurityTokenDescriptor
+            //{
+            //    Subject = new ClaimsIdentity(new Claim[]
+            //    {
+            //        new Claim("UserId", user.Id.ToString()),
+            //        new Claim(ClaimTypes.Name,user.Id.ToString()),
+            //        new Claim(ClaimTypes.Role,user.Role)
+            //    }),
+            //    Expires = DateTime.UtcNow.AddMinutes(15),
+            //    SigningCredentials = new(new SymmetricSecurityKey(key),SecurityAlgorithms.HmacSha256Signature)
+            //};
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+            //var token = tokenHandler.CreateToken(tokenDescriptor);
 
             LoginResponseDTO loginResponseDTO = new LoginResponseDTO()
             {
-                Token = tokenHandler.WriteToken(token),
-                APIUser = user,
+                Token = "",//tokenHandler.WriteToken(token),
+                APIUser = null,
                 UserId = user.Id
             };
 
