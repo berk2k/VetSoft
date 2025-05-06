@@ -1,23 +1,29 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 
-using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using Serilog;
 using TermProjectBackend.Context;
 using TermProjectBackend.Controllers;
 using TermProjectBackend.Source.Svc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Logging.ClearProviders(); 
-builder.Logging.AddConsole(); 
-builder.Logging.AddDebug();
+//builder.Logging.ClearProviders(); 
+//builder.Logging.AddConsole(); 
+//builder.Logging.AddDebug();
 
 
 
-builder.Logging.SetMinimumLevel(LogLevel.Information);
+//builder.Logging.SetMinimumLevel(LogLevel.Information);
 
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information() 
+    .WriteTo.Console()         
+    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day) 
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog(); 
 
 builder.Logging.AddFilter("Microsoft", LogLevel.Warning);
 builder.Logging.AddFilter("System", LogLevel.Warning);
@@ -37,7 +43,7 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IVaccinationService, VaccinationService>();
 
-builder.Services.AddSingleton<RabbitMqService>();
+
 
 
 // CORS configuration

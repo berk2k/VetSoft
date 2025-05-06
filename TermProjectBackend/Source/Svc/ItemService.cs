@@ -10,61 +10,75 @@ namespace TermProjectBackend.Source.Svc
 {
     public class ItemService : IItemService
     {
+        private readonly ILogger<ItemService> _logger;
         private readonly VetDbContext _vetDb;
 
-        public ItemService(VetDbContext vetDb)
+        public ItemService(VetDbContext vetDb, ILogger<ItemService> logger)
         {
-            _vetDb = vetDb;
+            _vetDb = vetDb;            _logger = logger;   
+
         }
 
         public Item AddItem(AddItemRequestDTO addItemRequestDTO)
         {
-           
-
-            // Create a new item
-            var newItem = new Item
+            try
             {
-                medicine_name = addItemRequestDTO.ItemName,
-                count = addItemRequestDTO.Count
-            };
+                _logger.LogInformation("AddItem method started. ItemName: {ItemName}, Count: {Count}", addItemRequestDTO.ItemName, addItemRequestDTO.Count);
 
-            // Add the new item to the database context and save changes
-            _vetDb.Items.Add(newItem);
-            _vetDb.SaveChanges();
+                var newItem = new Item
+                {
+                    medicine_name = addItemRequestDTO.ItemName,
+                    count = addItemRequestDTO.Count
+                };
 
-            // Return the newly added item
-            return newItem;
+                _vetDb.Items.Add(newItem);
+                _vetDb.SaveChanges();
+
+                _logger.LogInformation("Item successfully added. ItemId: {ItemId}", newItem.id);
+
+                return newItem;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while adding item. ItemName: {ItemName}, Count: {Count}", addItemRequestDTO.ItemName, addItemRequestDTO.Count);
+                throw new Exception($"Error occurred while adding item: {ex.Message}");
+            }
         }
+
+
 
 
 
         public void UpdateItem(UpdateItemRequestDTO updateItemRequestDTO)
         {
-            // Check if an item with the same name already exists
-            //var existingItem = _vetDb.Items.FirstOrDefault(i => i.medicine_name == updateItemRequestDTO.ItemName && i.id != updateItemRequestDTO.id);
-
-            //if (existingItem != null)
-            //{
-            //    throw new Exception("An item with the same name already exists.");
-            //}
-
-            // Check if the count is lower than 0
-            //if (updateItemRequestDTO.Count < 0)
-            //{
-            //    throw new ArgumentException("Count cannot be lower than 0.");
-            //}
-
-            var itemToUpdate = _vetDb.Items.Find(updateItemRequestDTO.id);
-
-            if (itemToUpdate != null)
+            try
             {
-                itemToUpdate.medicine_name = updateItemRequestDTO.ItemName;
-                itemToUpdate.count = updateItemRequestDTO.Count;
+                _logger.LogInformation("UpdateItem method started. ItemId: {ItemId}, NewItemName: {ItemName}, NewCount: {Count}",
+                    updateItemRequestDTO.id, updateItemRequestDTO.ItemName, updateItemRequestDTO.Count);
 
-                _vetDb.SaveChanges();
+                var itemToUpdate = _vetDb.Items.Find(updateItemRequestDTO.id);
+
+                if (itemToUpdate != null)
+                {
+                    itemToUpdate.medicine_name = updateItemRequestDTO.ItemName;
+                    itemToUpdate.count = updateItemRequestDTO.Count;
+
+                    _vetDb.SaveChanges();
+
+                    _logger.LogInformation("Item successfully updated. ItemId: {ItemId}", updateItemRequestDTO.id);
+                }
+                else
+                {
+                    _logger.LogWarning("Item not found for update. ItemId: {ItemId}", updateItemRequestDTO.id);
+                }
             }
-            
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while updating item. ItemId: {ItemId}", updateItemRequestDTO.id);
+                throw new Exception($"Error occurred while updating item: {ex.Message}");
+            }
         }
+
 
 
         public List<Item> GetAllItems()
@@ -82,41 +96,56 @@ namespace TermProjectBackend.Source.Svc
 
         public List<Item> GetItemByName(string medicineName)
         {
-            medicineName = medicineName.ToLower();
             try
             {
-                //autocomplete
+                _logger.LogInformation("GetItemByName method started. MedicineName: {MedicineName}", medicineName);
+
+                medicineName = medicineName.ToLower();
                 var items = _vetDb.Items
-                .Where(i => i.medicine_name.ToLower().Contains(medicineName))
-                .AsQueryable()
-                .ToList();
+                    .Where(i => i.medicine_name.ToLower().Contains(medicineName))
+                    .AsQueryable()
+                    .ToList();
 
-
-                if (items != null)
+                if (items != null && items.Any())
                 {
+                    _logger.LogInformation("Item search completed. Found: {ItemCount} item(s).", items.Count);
                     return items;
                 }
                 else
                 {
-                    
+                    _logger.LogWarning("No items found. MedicineName: {MedicineName}", medicineName);
                     return null;
                 }
             }
             catch (Exception ex)
             {
-                
+                _logger.LogError(ex, "Error occurred while searching for item. MedicineName: {MedicineName}", medicineName);
                 throw new Exception($"Error occurred while getting item by name: {ex.Message}");
             }
         }
 
+
         public List<Item> GetOutOfStockItems()
         {
-            var itemsWithZeroCount = _vetDb.Items
-            .Where(i => i.count == 0)
-            .AsQueryable()
-            .ToList();
+            try
+            {
+                _logger.LogInformation("GetOutOfStockItems method started.");
 
-            return itemsWithZeroCount;
+                var itemsWithZeroCount = _vetDb.Items
+                    .Where(i => i.count == 0)
+                    .AsQueryable()
+                    .ToList();
+
+                _logger.LogInformation("Out of stock items search completed. Found: {ItemCount} item(s).", itemsWithZeroCount.Count);
+
+                return itemsWithZeroCount;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while searching for out of stock items.");
+                throw new Exception($"Error occurred while getting out of stock items: {ex.Message}");
+            }
         }
+
     }
 }

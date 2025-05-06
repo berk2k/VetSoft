@@ -1,13 +1,9 @@
 ﻿using TermProjectBackend.Context;
 using TermProjectBackend.Models;
 using TermProjectBackend.Models.Dto;
-using System.Text;
 
-using Microsoft.AspNetCore.Connections;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+
+
 
 namespace TermProjectBackend.Source.Svc
 {
@@ -15,10 +11,7 @@ namespace TermProjectBackend.Source.Svc
     {
         private readonly VetDbContext _vetDb;
         private readonly INotificationService _notificationService;
-        private readonly ConnectionFactory _connectionFactory;
-        private const string QueueNameDelete = "delete_appointment_queue";
-        private const string QueueNameUpdate = "update_appointment_queue";
-        private readonly RabbitMqService _rabbitMqService;
+
 
 
 
@@ -253,32 +246,6 @@ namespace TermProjectBackend.Source.Svc
                 .Where(a => a.ClientID == userId)
                 .AsQueryable()
                 .ToList();
-        }
-
-        //private void SendDeleteAppointmentMessageToRabbitMQ()
-        //{
-        //    string deleteMessage = "Your appointment deleted";
-        //    using (var connection = _connectionFactory.CreateConnection())
-        //    using (var channel = connection.CreateModel())
-        //    {
-
-        //        channel.QueueDeclare(queue: QueueNameDelete,
-        //                             durable: false,
-        //                             exclusive: false,
-        //                             autoDelete: false,
-        //                             arguments: null);
-
-        //        channel.ExchangeDeclare("direct_exchange", ExchangeType.Fanout, true);
-
-        //        // Bildirim verisini JSON formatına dönüştür
-        //        string message = Newtonsoft.Json.JsonConvert.SerializeObject(deleteMessage);
-        //        var body = Encoding.UTF8.GetBytes(message);
-
-
-
-
-
-
                 _logger.LogDebug("GetUserAppointmentsWOPagination: Retrieved {Count} appointments for user ID: {UserId}",
                     appointments.Count, userId);
 
@@ -290,7 +257,5 @@ namespace TermProjectBackend.Source.Svc
                 throw;
             }
         }
-
-        
-    }
+    }        
 }

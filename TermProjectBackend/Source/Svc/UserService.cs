@@ -1,151 +1,163 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using TermProjectBackend.Context;
+﻿using TermProjectBackend.Context;
 using TermProjectBackend.Models;
 using TermProjectBackend.Models.Dto;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace TermProjectBackend.Source.Svc
 {
     public class UserService : IUserService
     {
         private readonly VetDbContext _vetDb;
-        //private string secretKey;
+        private readonly ILogger<UserService> _logger;
 
-        public UserService(VetDbContext vetDb, IConfiguration configuration)
+        public UserService(VetDbContext vetDb, IConfiguration configuration, ILogger<UserService> logger)
         {
             _vetDb = vetDb;
-            //secretKey = configuration.GetValue<string>("ApiSettings:Secret");
-            
+            _logger = logger;
+            _logger.LogInformation("UserService initialized");
         }
 
         public int getUserId(User user)
         {
+            _logger.LogDebug("getUserId called for user: {UserName}", user.UserName);
             return user.Id;
         }
 
         public int getUserIdByName(string userName)
         {
+            _logger.LogInformation("getUserIdByName called for username: {UserName}", userName);
+
             var user = _vetDb.Users.FirstOrDefault(u => u.UserName == userName);
             if (user != null)
             {
+                _logger.LogDebug("getUserIdByName: Found user ID {UserId} for username {UserName}", user.Id, userName);
                 return user.Id;
             }
             else
             {
+                _logger.LogWarning("getUserIdByName: User not found for username {UserName}", userName);
                 throw new ArgumentException("User not found", nameof(userName));
             }
         }
 
         public User GetUserInformationById(int id)
         {
-            // Assuming User has an Id property
+            _logger.LogInformation("GetUserInformationById called for ID: {UserId}", id);
+
             User retrievedUser = _vetDb.Users.Find(id);
 
-            // You can modify the logic based on your actual data model
             if (retrievedUser == null)
             {
-                // Handle the case where the user is not found
+                _logger.LogWarning("GetUserInformationById: User with ID {UserId} not found", id);
                 throw new InvalidOperationException($"User with ID {id} not found.");
             }
 
-            // Optionally, you can exclude sensitive information before returning the user
-            // retrievedUser.SensitiveProperty = null;
+            _logger.LogDebug("GetUserInformationById: Successfully retrieved user {UserName} (ID: {UserId})",
+                retrievedUser.UserName, id);
+
+            // Güvenlik için şifreyi temizle
+            retrievedUser.Password = "";
 
             return retrievedUser;
         }
 
         public bool IsUserUnique(string userName)
         {
-            var user  = _vetDb.Users.FirstOrDefault(u => u.UserName == userName);
+            _logger.LogInformation("IsUserUnique called for username: {UserName}", userName);
 
-            if(user == null)
-            {
-                return true;
-            }
+            var user = _vetDb.Users.FirstOrDefault(u => u.UserName == userName);
 
-            return false;
+            bool isUnique = (user == null);
+            _logger.LogDebug("IsUserUnique result for {UserName}: {IsUnique}", userName, isUnique);
+
+            return isUnique;
         }
 
-        public LoginResponseDTO Login(LoginRequestDTO loginReguestDTO)
+        public LoginResponseDTO Login(LoginRequestDTO loginRequestDTO)
         {
-            var user = _vetDb.Users.FirstOrDefault(u => u.UserName == loginReguestDTO.UserName && u.Password == loginReguestDTO.Password);
+            _logger.LogInformation("Login attempt for username: {UserName}", loginRequestDTO.UserName);
 
-            if(user == null)
+            var user = _vetDb.Users.FirstOrDefault(u =>
+                u.UserName == loginRequestDTO.UserName &&
+                u.Password == loginRequestDTO.Password);
+
+            if (user == null)
             {
+                _logger.LogWarning("Login failed: Invalid credentials for username {UserName}", loginRequestDTO.UserName);
                 return new LoginResponseDTO()
                 {
                     Token = "",
-                    APIUser = null
+                    APIUser = null,
+                    UserId = 0
                 };
             }
 
-            //var tokenHandler = new JwtSecurityTokenHandler();
+            _logger.LogInformation("Login successful for user {UserName} (ID: {UserId})", user.UserName, user.Id);
 
-            //var key = Encoding.ASCII.GetBytes(secretKey);
-
-            //var tokenDescriptor = new SecurityTokenDescriptor
-            //{
-            //    Subject = new ClaimsIdentity(new Claim[]
-            //    {
-            //        new Claim("UserId", user.Id.ToString()),
-            //        new Claim(ClaimTypes.Name,user.Id.ToString()),
-            //        new Claim(ClaimTypes.Role,user.Role)
-            //    }),
-            //    Expires = DateTime.UtcNow.AddMinutes(15),
-            //    SigningCredentials = new(new SymmetricSecurityKey(key),SecurityAlgorithms.HmacSha256Signature)
-            //};
-
-            //var token = tokenHandler.CreateToken(tokenDescriptor);
-
+            // Auth mantığı kaldırıldı, sadece kullanıcı bilgisi dönüyoruz
             LoginResponseDTO loginResponseDTO = new LoginResponseDTO()
             {
-                Token = "",//tokenHandler.WriteToken(token),
-                APIUser = null,
+                Token = "no-token", // Token üretimi kaldırıldı
+                APIUser = user,
                 UserId = user.Id
             };
 
-            return loginResponseDTO;
+            // Güvenlik için API yanıtında şifreyi temizle
+            if (loginResponseDTO.APIUser != null)
+            {
+                loginResponseDTO.APIUser.Password = "";
+            }
 
+            return loginResponseDTO;
         }
 
-        public User Register(RegisterationRequestDTO reqisterationRequestDTO)
+        public User Register(RegisterationRequestDTO registerationRequestDTO)
         {
+            _logger.LogInformation("Register called for username: {UserName}", registerationRequestDTO.UserName);
+
             User user = new User()
             {
-                UserName = reqisterationRequestDTO.UserName,
-                Name = reqisterationRequestDTO.Name,
-                Password = reqisterationRequestDTO.Password,
-                Role = reqisterationRequestDTO.Role,
+                UserName = registerationRequestDTO.UserName,
+                Name = registerationRequestDTO.Name,
+                Password = registerationRequestDTO.Password,
+                Role = registerationRequestDTO.Role,
             };
+
+            _logger.LogDebug("Register: Adding new user {UserName} with role {Role}", user.UserName, user.Role);
 
             _vetDb.Users.Add(user);
             _vetDb.SaveChanges();
 
+            _logger.LogInformation("Register successful: Created user ID {UserId} for {UserName}", user.Id, user.UserName);
+
+            // Güvenlik için password temizle
             user.Password = "";
 
             return user;
-
         }
 
         public void DeleteAccount(int id)
         {
-            // Assuming User has an Id property
+            _logger.LogInformation("DeleteAccount called for user ID: {UserId}", id);
+
             User userToDelete = _vetDb.Users.Find(id);
 
             if (userToDelete == null)
             {
-                // Handle the case where the user is not found
+                _logger.LogWarning("DeleteAccount failed: User with ID {UserId} not found", id);
                 throw new InvalidOperationException($"User with ID {id} not found.");
             }
 
+            _logger.LogInformation("DeleteAccount: Deleting user {UserName} (ID: {UserId})", userToDelete.UserName, id);
+
             // Delete associated pets
             var userPets = _vetDb.Pets.Where(p => p.OwnerID == id).ToList();
+            _logger.LogDebug("DeleteAccount: Removing {PetCount} pets for user ID {UserId}", userPets.Count, id);
             _vetDb.Pets.RemoveRange(userPets);
 
             // Delete associated appointments
             var userAppointments = _vetDb.Appointments.Where(a => a.ClientID == id).ToList();
+            _logger.LogDebug("DeleteAccount: Removing {AppointmentCount} appointments for user ID {UserId}", userAppointments.Count, id);
             _vetDb.Appointments.RemoveRange(userAppointments);
 
             // Delete the user
@@ -153,15 +165,20 @@ namespace TermProjectBackend.Source.Svc
 
             // Save changes to the database
             _vetDb.SaveChanges();
-        }
 
-        
+            _logger.LogInformation("DeleteAccount successful: User {UserName} (ID: {UserId}) and all associated data deleted",
+                userToDelete.UserName, id);
+        }
 
         public List<string> GetAllUserNames()
         {
-            // Assuming User entity has a property called "userName"
-            return _vetDb.Users.Select(u => u.UserName).ToList();
-        }
+            _logger.LogInformation("GetAllUserNames called");
 
-}
+            var userNames = _vetDb.Users.Select(u => u.UserName).ToList();
+
+            _logger.LogDebug("GetAllUserNames: Retrieved {Count} usernames", userNames.Count);
+
+            return userNames;
+        }
+    }
 }
