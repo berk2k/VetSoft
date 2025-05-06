@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Serilog.Formatting.Compact;
 using TermProjectBackend.Context;
 using TermProjectBackend.Controllers;
 using TermProjectBackend.Source.Svc;
@@ -18,8 +19,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information() 
-    .WriteTo.Console()         
-    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day) 
+    .WriteTo.Console()
+    .WriteTo.Seq("http://localhost:5341")
+    .WriteTo.File(new CompactJsonFormatter(),"Logs/log-.txt", rollingInterval: RollingInterval.Day) 
     .Enrich.FromLogContext()
     .CreateLogger();
 

@@ -15,7 +15,8 @@ namespace TermProjectBackend.Source.Svc
 
         public ItemService(VetDbContext vetDb, ILogger<ItemService> logger)
         {
-            _vetDb = vetDb;            _logger = logger;   
+            _vetDb = vetDb;
+            _logger = logger;   
 
         }
 
