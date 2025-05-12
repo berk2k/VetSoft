@@ -9,12 +9,14 @@ namespace TermProjectBackend.Source.Svc
     {
         private readonly VetDbContext _vetDb;
         private readonly ILogger<UserService> _logger;
-
-        public UserService(VetDbContext vetDb, IConfiguration configuration, ILogger<UserService> logger)
+        private readonly ITokenService _tokenService;
+        public UserService(VetDbContext vetDb, IConfiguration configuration, ILogger<UserService> logger, ITokenService tokenService)
         {
             _vetDb = vetDb;
             _logger = logger;
+            _tokenService = tokenService;
             _logger.LogInformation("UserService initialized");
+            
         }
 
         public int getUserId(User user)
@@ -55,7 +57,7 @@ namespace TermProjectBackend.Source.Svc
             _logger.LogDebug("GetUserInformationById: Successfully retrieved user {UserName} (ID: {UserId})",
                 retrievedUser.UserName, id);
 
-            // Güvenlik için şifreyi temizle
+            
             retrievedUser.Password = "";
 
             return retrievedUser;
@@ -94,15 +96,17 @@ namespace TermProjectBackend.Source.Svc
 
             _logger.LogInformation("Login successful for user {UserName} (ID: {UserId})", user.UserName, user.Id);
 
-            // Auth mantığı kaldırıldı, sadece kullanıcı bilgisi dönüyoruz
+
+            var tokenString = _tokenService.GenerateToken(user.Id, user.UserName);
+
             LoginResponseDTO loginResponseDTO = new LoginResponseDTO()
             {
-                Token = "no-token", // Token üretimi kaldırıldı
+                Token = tokenString,  
                 APIUser = user,
                 UserId = user.Id
             };
 
-            // Güvenlik için API yanıtında şifreyi temizle
+
             if (loginResponseDTO.APIUser != null)
             {
                 loginResponseDTO.APIUser.Password = "";

@@ -1,21 +1,25 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Formatting.Compact;
+using System.Text;
 using TermProjectBackend.Context;
 using TermProjectBackend.Controllers;
 using TermProjectBackend.Source.Svc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//builder.Logging.ClearProviders(); 
-//builder.Logging.AddConsole(); 
-//builder.Logging.AddDebug();
+// Logging is configured by default, but you can customize it:
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
 
-
-//builder.Logging.SetMinimumLevel(LogLevel.Information);
+// Setting minimum log level
+builder.Logging.SetMinimumLevel(LogLevel.Information);
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information() 
@@ -44,8 +48,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IVaccinationService, VaccinationService>();
-
-
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 
 // CORS configuration
@@ -96,26 +99,26 @@ builder.Services.AddSwaggerGen(options =>
 
 });
 
-//var key = builder.Configuration.GetValue<string>("ApiSettings:Secret");
+var key = builder.Configuration.GetValue<string>("ApiSettings:Secret");
 
-//builder.Services.AddAuthentication(x =>
-//{
-//    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//}).AddJwtBearer(x =>
-//{
-//    x.RequireHttpsMetadata = false;
-//    x.SaveToken = true;
-//    x.TokenValidationParameters = new TokenValidationParameters
-//    {
-//        ValidateIssuerSigningKey = true,
-//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
-//        ValidateIssuer = false,
-//        ValidateAudience = false
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
+        ValidateIssuer = false,
+        ValidateAudience = false
 
-//    };
+    };
 
-//});
+});
 builder.Services.AddDbContext<VetDbContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection"));
