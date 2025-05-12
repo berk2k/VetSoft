@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using TermProjectBackend.Extensions;
 using TermProjectBackend.Models;
 using TermProjectBackend.Models.Dto;
 using TermProjectBackend.Source.Svc;
@@ -9,7 +10,7 @@ namespace TermProjectBackend.Controllers
 {
     [Route("api/UserProfile")]
     [ApiController]
-    public class UserProfileController : Controller
+    public class UserProfileController : BaseController
     {
         private IUserService _userService;
         protected APIResponse _response;
@@ -61,33 +62,20 @@ namespace TermProjectBackend.Controllers
 
 
         [HttpGet("GetUserInfo")]
-    //    [Authorize]
-        public ActionResult<UserProfileDTO> GetUserInfo(int id)
+        [Authorize]
+        public ActionResult<UserProfileDTO> GetUserInfo()
         {
-
-        /*    var userId = User.FindFirst("UserId")?.Value;
-
-            if (!int.TryParse(userId, out int parsedUserId))
-            {
-                // Handle conversion failure
-                return BadRequest(new APIResponse
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    IsSuccess = false,
-                    Status = "Fail",
-                    ErrorMessage = "Invalid user ID format"
-                });
-            }*/
-
-            // Retrieve user information based on the ID
             try
             {
-                User user = _userService.GetUserInformationById(id);
+                var userId = User.GetUserId();
+                if (userId == null)
+                    return Unauthorized();
+                User user = _userService.GetUserInformationById((int)userId);
 
                 // Map the User entity to UserProfileDTO
                 var userProfileDTO = new UserProfileDTO
                 {
-                    Id = id,
+                    Id = (int)userId,
                     UserName = user.UserName,
                     Name = user.Name
                 };
