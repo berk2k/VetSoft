@@ -75,7 +75,7 @@ namespace TermProjectBackend.Source.Svc
             return isUnique;
         }
 
-        public LoginResponseDTO Login(LoginRequestDTO loginRequestDTO)
+        public async Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO)
         {
             _logger.LogInformation("Login attempt for username: {UserName}", loginRequestDTO.UserName);
 
@@ -89,6 +89,7 @@ namespace TermProjectBackend.Source.Svc
                 return new LoginResponseDTO()
                 {
                     Token = "",
+                    RefreshToken = "",
                     APIUser = null,
                     UserId = 0
                 };
@@ -98,10 +99,13 @@ namespace TermProjectBackend.Source.Svc
 
 
             var tokenString = _tokenService.GenerateToken(user.Id, user.UserName);
+            var refreshTokenResponse = await _tokenService.CreateRefreshTokenAsync(user.Id);
 
             LoginResponseDTO loginResponseDTO = new LoginResponseDTO()
             {
-                Token = tokenString,  
+                Token = tokenString,
+                RefreshToken = refreshTokenResponse.RefreshToken,
+                RefreshTokenExpiryDate = refreshTokenResponse.ExpiryDate,
                 APIUser = user,
                 UserId = user.Id
             };

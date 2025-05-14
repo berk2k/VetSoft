@@ -10,7 +10,7 @@ namespace TermProjectBackend.Source.Svc
         public int getUserId(User user);
 
         public int getUserIdByName(string userName);
-        public LoginResponseDTO Login(LoginRequestDTO loginReguestDTO);
+        public Task <LoginResponseDTO> Login(LoginRequestDTO loginReguestDTO);
 
         public User Register(RegisterationRequestDTO reqisterationRequestDTO);
 
