@@ -22,23 +22,31 @@ namespace TermProjectBackend.Controllers
         }
 
         [HttpPost("login")]
-        public ActionResult<APIResponse> Login([FromBody] LoginRequestDTO loginRequestDTO)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequestDTO)
         {
-            var loginResponse = _userService.Login(loginRequestDTO);
+            var loginResponse = await _userService.Login(loginRequestDTO);
 
-            if (loginResponse.APIUser == null || string.IsNullOrEmpty(loginResponse.Token))
+            if (string.IsNullOrEmpty(loginResponse.Token))
             {
-                _response.StatusCode = HttpStatusCode.BadRequest;
-                _response.IsSuccess = false;
-                _response.Status = "Fail";
-                _response.ErrorMessage = "Invalid username or password.";
-                return BadRequest(_response);
+                return Unauthorized(new { message = "Invalid username or password" });
             }
 
-            _response.StatusCode = HttpStatusCode.OK;
-            _response.IsSuccess = true;
-            _response.Result = loginResponse;
-            return Ok(_response);
+            //Response.Cookies.Append("refreshToken", loginResponse.RefreshToken, new CookieOptions
+            //{
+            //    HttpOnly = true,
+            //    Expires = loginResponse.RefreshTokenExpiryDate,
+            //    Secure = true, // Use in production with HTTPS
+            //    SameSite = SameSiteMode.Strict
+            //});
+
+            return Ok(new
+            {
+                token = loginResponse.Token,
+                refreshToken = loginResponse.RefreshToken, // Can also be omitted if using cookies
+                expiresAt = loginResponse.RefreshTokenExpiryDate,
+                userId = loginResponse.UserId,
+                user = loginResponse.APIUser
+            });
         }
 
         [HttpPost("LoginForStaff")]
