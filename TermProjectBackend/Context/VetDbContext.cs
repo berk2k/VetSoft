@@ -34,6 +34,18 @@ namespace TermProjectBackend.Context
 
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Configure relationships
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(rt => rt.AppUser)
+                .WithMany() // Specify related navigation property in ApplicationUser if needed
+                .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade); // Delete tokens when user is deleted
+        }
+
 
     }
 }
