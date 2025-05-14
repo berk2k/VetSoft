@@ -32,6 +32,8 @@ namespace TermProjectBackend.Context
 
         public virtual DbSet<VeterinarianMessages> VeterinarianMessages { get; set; }
 
+        public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+
 
     }
 }
