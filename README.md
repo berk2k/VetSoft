@@ -1,4 +1,4 @@
-# 🐾 Veterinary Clinic Management System
+# 🐾 Veterinary Clinic Workflow & Pet Owner Mobile App
 
 A **modern, cloud-based web and mobile application** designed to revolutionize the way veterinary clinics operate. This system replaces outdated, paper-based processes with a seamless digital platform—empowering both **veterinarians** and **pet owners** with real-time data, communication, and efficiency.
 
