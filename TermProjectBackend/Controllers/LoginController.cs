@@ -44,29 +44,26 @@ namespace TermProjectBackend.Controllers
                 token = loginResponse.Token,
                 refreshToken = loginResponse.RefreshToken, // Can also be omitted if using cookies
                 expiresAt = loginResponse.RefreshTokenExpiryDate,
-                userId = loginResponse.UserId,
                 user = loginResponse.APIUser
             });
         }
 
-        [HttpPost("LoginForStaff")]
-        public ActionResult<APIResponse> LoginForWeb([FromBody] LoginRequestVetStaffDTO loginRequestDTO)
+        [HttpPost("Staff")]
+        public async Task<IActionResult> LoginForWeb([FromBody] LoginRequestVetStaffDTO loginRequestDTO)
         {
-            var loginResponse = _vetStaffService.Login(loginRequestDTO);
-
-            if (loginResponse.APIUser == null || string.IsNullOrEmpty(loginResponse.Token))
+            var loginResponse = await _vetStaffService.Login(loginRequestDTO);
+            if (string.IsNullOrEmpty(loginResponse.Token))
             {
-                _response.StatusCode = HttpStatusCode.BadRequest;
-                _response.IsSuccess = false;
-                _response.Status = "Fail";
-                _response.ErrorMessage = "Invalid email or password.";
-                return BadRequest(_response);
+                return Unauthorized(new { message = "Invalid username or password" });
             }
 
-            _response.StatusCode = HttpStatusCode.OK;
-            _response.IsSuccess = true;
-            _response.Result = loginResponse;
-            return Ok(_response);
+            return Ok(new
+            {
+                token = loginResponse.Token,
+                refreshToken = loginResponse.RefreshToken,
+                expiresAt = loginResponse.RefreshTokenExpiryDate,
+                user = loginResponse.APIUser
+            });
         }
     }
 }

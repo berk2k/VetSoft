@@ -11,13 +11,14 @@ namespace TermProjectBackend.Source.Svc
         private readonly VetDbContext _vetDb;
         private readonly ILogger<UserService> _logger;
         private readonly ITokenService _tokenService;
-        public UserService(VetDbContext vetDb, IConfiguration configuration, ILogger<UserService> logger, ITokenService tokenService)
+        private readonly IPasswordHasher _passwordHasher;
+        public UserService(VetDbContext vetDb, ILogger<UserService> logger, ITokenService tokenService, IPasswordHasher passwordHasher)
         {
             _vetDb = vetDb;
             _logger = logger;
             _tokenService = tokenService;
             _logger.LogInformation("UserService initialized");
-            
+            _passwordHasher = passwordHasher;
         }
 
         public int getUserId(User user)
@@ -80,20 +81,19 @@ namespace TermProjectBackend.Source.Svc
         {
             _logger.LogInformation("Login attempt for username: {UserName}", loginRequestDTO.UserName);
 
-            var user = _vetDb.Users.FirstOrDefault(u =>
-                u.UserName == loginRequestDTO.UserName &&
-                u.Password == loginRequestDTO.Password);
+            var user = _vetDb.Users.SingleOrDefault(u => u.UserName == loginRequestDTO.UserName);
 
             if (user == null)
             {
                 _logger.LogWarning("Login failed: Invalid credentials for username {UserName}", loginRequestDTO.UserName);
-                return new LoginResponseDTO()
-                {
-                    Token = "",
-                    RefreshToken = "",
-                    APIUser = null,
-                    UserId = 0
-                };
+                return FailedLoginResponse();
+            }
+
+            bool isPasswordValid = _passwordHasher.VerifyPassword(loginRequestDTO.Password, user.Password);
+            if (!isPasswordValid)
+            {
+                _logger.LogWarning("Login failed: Incorrect password for username {UserName}", loginRequestDTO.UserName);
+                return FailedLoginResponse();
             }
 
             _logger.LogInformation("Login successful for user {UserName} (ID: {UserId})", user.UserName, user.Id);
@@ -107,28 +107,40 @@ namespace TermProjectBackend.Source.Svc
                 Token = tokenString,
                 RefreshToken = refreshTokenResponse.RefreshToken,
                 RefreshTokenExpiryDate = refreshTokenResponse.ExpiryDate,
-                APIUser = user,
-                UserId = user.Id
+                APIUser = SanitizeUser(user),
+                
             };
 
-
-            if (loginResponseDTO.APIUser != null)
-            {
-                loginResponseDTO.APIUser.Password = "";
-            }
-
             return loginResponseDTO;
+        }
+
+        private LoginResponseDTO FailedLoginResponse()
+        {
+            return new LoginResponseDTO
+            {
+                Token = "",
+                RefreshToken = "",
+                APIUser = null,
+                
+            };
+        }
+
+        private User SanitizeUser(User user)
+        {
+            user.Password = "";
+            return user;
         }
 
         public User Register(RegisterationRequestDTO registerationRequestDTO)
         {
             _logger.LogInformation("Register called for username: {UserName}", registerationRequestDTO.UserName);
 
+            var hashPassword = _passwordHasher.HashPassword(registerationRequestDTO.Password);
             User user = new User()
             {
                 UserName = registerationRequestDTO.UserName,
                 Name = registerationRequestDTO.Name,
-                Password = registerationRequestDTO.Password,
+                Password = hashPassword,
                 Role = registerationRequestDTO.Role,
             };
 
@@ -139,7 +151,7 @@ namespace TermProjectBackend.Source.Svc
 
             _logger.LogInformation("Register successful: Created user ID {UserId} for {UserName}", user.Id, user.UserName);
 
-            // Güvenlik için password temizle
+            
             user.Password = "";
 
             return user;

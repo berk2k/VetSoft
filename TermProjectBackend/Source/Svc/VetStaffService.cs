@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -12,11 +13,15 @@ namespace TermProjectBackend.Source.Svc
     public class VetStaffService : IVetStaffService
     {
         private readonly VetDbContext _vetDb;
-        private string secretKey;
-        public VetStaffService(VetDbContext vetDb, IConfiguration configuration)
+        private readonly ITokenService _tokenService;
+        private readonly IPasswordHasher _passwordHasher;
+        private readonly ILogger<UserService> _logger;
+        public VetStaffService(VetDbContext vetDb, ITokenService tokenService, IPasswordHasher passwordHasher, ILogger<UserService> logger)
         {
             _vetDb = vetDb;
-            secretKey = configuration.GetValue<string>("ApiSettings:Secret");
+            _passwordHasher = passwordHasher;
+            _tokenService = tokenService;
+            _logger = logger;
         }
 
         public int getStaffId(VetStaff vetStaff)
@@ -25,54 +30,61 @@ namespace TermProjectBackend.Source.Svc
         }
 
 
-        public LoginResponseVetStaffDTO Login(LoginRequestVetStaffDTO loginReguestDTO)
+        public async Task<LoginResponseVetStaffDTO> Login(LoginRequestVetStaffDTO loginRequestDTO)
         {
-            var staff = _vetDb.VetStaff.FirstOrDefault(u => u.Email == loginReguestDTO.Email && u.Password == loginReguestDTO.Password);
+            _logger.LogInformation("Login attempt for email: {Email}", loginRequestDTO.Email);
 
-            if (staff == null)
+            var user = await _vetDb.VetStaff.SingleOrDefaultAsync(u => u.Email == loginRequestDTO.Email);
+            if (user == null)
             {
-                return new LoginResponseVetStaffDTO()
-                {
-                    Token = "",
-                    APIUser = null
-                };
+                _logger.LogWarning("Login failed: Invalid credentials for email {Email}", loginRequestDTO.Email);
+                return FailedLoginResponse();
             }
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            var key = Encoding.ASCII.GetBytes(secretKey);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
+            bool isPasswordValid = _passwordHasher.VerifyPassword(loginRequestDTO.Password, user.Password);
+            if (!isPasswordValid)
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim("UserId", staff.Id.ToString()),
-                    new Claim(ClaimTypes.Name,staff.Id.ToString()),
-                    new Claim(ClaimTypes.Role,staff.Role)
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(15),
-                SigningCredentials = new(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
+                _logger.LogWarning("Login failed: Incorrect password for email {Email}", loginRequestDTO.Email);
+                return FailedLoginResponse();
+            }
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+            _logger.LogInformation("Login successful for user {Email} (ID: {Id})", user.Email, user.Id);
 
-            LoginResponseVetStaffDTO loginResponseDTO = new LoginResponseVetStaffDTO()
+            var tokenString = _tokenService.GenerateToken(user.Id, user.Email);
+            var refreshTokenResponse = await _tokenService.CreateRefreshTokenAsync(user.Id);
+
+            return new LoginResponseVetStaffDTO
             {
-                Token = tokenHandler.WriteToken(token),
-                APIUser= staff,
-                UserId = staff.Id
+                Token = tokenString,
+                RefreshToken = refreshTokenResponse.RefreshToken,
+                RefreshTokenExpiryDate = refreshTokenResponse.ExpiryDate,
+                APIUser = SanitizeUser(user)
             };
+        }
 
-            return loginResponseDTO;
+        private LoginResponseVetStaffDTO FailedLoginResponse()
+        {
+            return new LoginResponseVetStaffDTO
+            {
+                Token = "",
+                RefreshToken = "",
+                APIUser = null,
+            };
+        }
 
+        private VetStaff SanitizeUser(VetStaff user)
+        {
+            user.Password = "";
+            return user;
         }
         public VetStaff CreateVetStaff(CreateNewStaffDTO vetStaffDTO)
         {
+            var hashPassword = _passwordHasher.HashPassword(vetStaffDTO.Password);
             VetStaff vetStaff = new VetStaff()
             {
                 Email = vetStaffDTO.Email,
                 Name = vetStaffDTO.Name,
-                Password = vetStaffDTO.Password,
+                Password = hashPassword,
                 Role = vetStaffDTO.Role,
             };
 

@@ -41,8 +41,8 @@ builder.Logging.AddFilter("TermProjectBackend.Source.Svc", LogLevel.Debug);
 builder.Services.AddControllers();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPetService, PetService>();
-builder.Services.AddScoped<LoginController>();
-builder.Services.AddScoped<AddPetController>();
+//builder.Services.AddScoped<LoginController>();
+//builder.Services.AddScoped<AddPetController>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IVetStaffService, VetStaffService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
@@ -50,6 +50,7 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IVaccinationService, VaccinationService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
 
 // CORS configuration

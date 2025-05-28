@@ -9,7 +9,7 @@ namespace TermProjectBackend.Source.Svc.Interfaces
 
         public int getStaffId(VetStaff vetStaff);
 
-        public LoginResponseVetStaffDTO Login(LoginRequestVetStaffDTO loginReguestDTO);
+        public Task<LoginResponseVetStaffDTO> Login(LoginRequestVetStaffDTO loginReguestDTO);
 
         public void DeleteVetStaff(int id);
 
