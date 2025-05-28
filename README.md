@@ -92,6 +92,7 @@ Once deployed:
 
 - Payment integration (Stripe or PayPal)
 - Real-time video consultation module
+- IOS app for pet owners 
 
 ---
 
