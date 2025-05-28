@@ -1,11 +1,11 @@
 ﻿using TermProjectBackend.Models;
 using TermProjectBackend.Models.Dto;
 
-namespace TermProjectBackend.Source.Svc
+namespace TermProjectBackend.Source.Svc.Interfaces
 {
     public interface IItemService
     {
-        public Item AddItem (AddItemRequestDTO addItemRequestDTO);
+        public Item AddItem(AddItemRequestDTO addItemRequestDTO);
 
         public void UpdateItem(UpdateItemRequestDTO updateItemRequestDTO);
 
@@ -13,7 +13,7 @@ namespace TermProjectBackend.Source.Svc
 
         List<Item> GetItemsPerPage(int page, int pageSize);
 
-        public List<Item> GetItemByName (string medicineName);
+        public List<Item> GetItemByName(string medicineName);
 
         public List<Item> GetOutOfStockItems();
     }

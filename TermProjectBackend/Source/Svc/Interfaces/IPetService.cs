@@ -1,14 +1,14 @@
 ﻿using TermProjectBackend.Models.Dto;
 using TermProjectBackend.Models;
 
-namespace TermProjectBackend.Source.Svc
+namespace TermProjectBackend.Source.Svc.Interfaces
 {
     public interface IPetService
     {
-        bool IsPetUnique(String name);
+        bool IsPetUnique(string name);
         public Pet AddPet(AddPetRequestDTO addPetRequestDTO/*,int id*/);
 
-        public String GetPetNameById(int id);
+        public string GetPetNameById(int id);
 
         public List<GetPetDTO> GetPetInformationById(int id);
     }

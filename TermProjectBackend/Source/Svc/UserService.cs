@@ -2,6 +2,7 @@
 using TermProjectBackend.Models;
 using TermProjectBackend.Models.Dto;
 using Microsoft.Extensions.Logging;
+using TermProjectBackend.Source.Svc.Interfaces;
 
 namespace TermProjectBackend.Source.Svc
 {

@@ -1,7 +1,7 @@
 ﻿using TermProjectBackend.Models;
 using TermProjectBackend.Models.Dto;
 
-namespace TermProjectBackend.Source.Svc
+namespace TermProjectBackend.Source.Svc.Interfaces
 {
     public interface IVetStaffService
     {
@@ -15,8 +15,8 @@ namespace TermProjectBackend.Source.Svc
 
         public void UpdateVetStaff(UpdateVetStaffDTO vetStaffDTO);
 
-        public List<VetStaff> GetAllStaff(int page,int pageSize);
+        public List<VetStaff> GetAllStaff(int page, int pageSize);
 
-        
+
     }
 }

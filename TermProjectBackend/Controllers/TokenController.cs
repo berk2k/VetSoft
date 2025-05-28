@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TermProjectBackend.Extensions;
 using TermProjectBackend.Models.Dto;
-using TermProjectBackend.Source.Svc;
+using TermProjectBackend.Source.Svc.Interfaces;
 
 namespace TermProjectBackend.Controllers
 {

@@ -3,6 +3,7 @@ using TermProjectBackend.Models.Dto;
 using TermProjectBackend.Models;
 using System.Text;
 using RabbitMQ.Client;
+using TermProjectBackend.Source.Svc.Interfaces;
 
 namespace TermProjectBackend.Source.Svc
 {

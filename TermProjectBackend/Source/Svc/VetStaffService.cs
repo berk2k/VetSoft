@@ -5,6 +5,7 @@ using System.Text;
 using TermProjectBackend.Context;
 using TermProjectBackend.Models;
 using TermProjectBackend.Models.Dto;
+using TermProjectBackend.Source.Svc.Interfaces;
 
 namespace TermProjectBackend.Source.Svc
 {

@@ -1,11 +1,11 @@
 ﻿using TermProjectBackend.Models;
 using TermProjectBackend.Models.Dto;
 
-namespace TermProjectBackend.Source.Svc
+namespace TermProjectBackend.Source.Svc.Interfaces
 {
     public interface IAppointmentService
     {
-        public Appointment BookAppointment(AppointmentDTO newAppointment,int id);
+        public Appointment BookAppointment(AppointmentDTO newAppointment, int id);
 
         public Appointment GetAppointmentById(int appointmentId);
         public void RemoveAppointment(int id);

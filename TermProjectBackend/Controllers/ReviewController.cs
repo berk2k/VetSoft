@@ -2,7 +2,7 @@
 using System.Net;
 using TermProjectBackend.Models.Dto;
 using TermProjectBackend.Models;
-using TermProjectBackend.Source.Svc;
+using TermProjectBackend.Source.Svc.Interfaces;
 
 namespace TermProjectBackend.Controllers
 {

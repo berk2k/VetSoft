@@ -2,7 +2,7 @@
 using TermProjectBackend.Models;
 using TermProjectBackend.Models.Dto;
 
-namespace TermProjectBackend.Source.Svc
+namespace TermProjectBackend.Source.Svc.Interfaces
 {
     public interface INotificationService
     {

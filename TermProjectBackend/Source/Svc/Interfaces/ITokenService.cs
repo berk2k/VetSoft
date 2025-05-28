@@ -1,7 +1,7 @@
 ﻿using TermProjectBackend.Models.Dto;
 using TermProjectBackend.Models;
 
-namespace TermProjectBackend.Source.Svc
+namespace TermProjectBackend.Source.Svc.Interfaces
 {
     public interface ITokenService
     {
@@ -9,13 +9,13 @@ namespace TermProjectBackend.Source.Svc
 
         string GenerateRefreshToken();
 
-     
+
         Task<RefreshTokenResponse> CreateRefreshTokenAsync(int userId);
 
-     
+
         Task<TokenRefreshResult> RefreshAccessTokenAsync(string refreshToken);
 
-        
+
         Task RevokeRefreshTokenAsync(int userId, string refreshToken = null);
     }
 }

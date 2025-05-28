@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TermProjectBackend.Models.Dto;
-using TermProjectBackend.Source.Svc;
 using System.Net;
 using TermProjectBackend.Models;
+using TermProjectBackend.Source.Svc.Interfaces;
 
 namespace TermProjectBackend.Controllers
 {

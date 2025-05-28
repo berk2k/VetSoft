@@ -9,6 +9,7 @@ using System.Text;
 using TermProjectBackend.Context;
 using TermProjectBackend.Controllers;
 using TermProjectBackend.Source.Svc;
+using TermProjectBackend.Source.Svc.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

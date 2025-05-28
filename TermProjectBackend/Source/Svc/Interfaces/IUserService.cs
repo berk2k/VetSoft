@@ -1,7 +1,7 @@
 ﻿using TermProjectBackend.Models;
 using TermProjectBackend.Models.Dto;
 
-namespace TermProjectBackend.Source.Svc
+namespace TermProjectBackend.Source.Svc.Interfaces
 {
     public interface IUserService
     {
@@ -10,7 +10,7 @@ namespace TermProjectBackend.Source.Svc
         public int getUserId(User user);
 
         public int getUserIdByName(string userName);
-        public Task <LoginResponseDTO> Login(LoginRequestDTO loginReguestDTO);
+        public Task<LoginResponseDTO> Login(LoginRequestDTO loginReguestDTO);
 
         public User Register(RegisterationRequestDTO reqisterationRequestDTO);
 

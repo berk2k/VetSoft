@@ -7,6 +7,7 @@ using System.Text;
 using TermProjectBackend.Context;
 using TermProjectBackend.Models;
 using TermProjectBackend.Models.Dto;
+using TermProjectBackend.Source.Svc.Interfaces;
 
 namespace TermProjectBackend.Source.Svc
 {
@@ -22,7 +23,7 @@ namespace TermProjectBackend.Source.Svc
             _secretKey = configuration["ApiSettings:Secret"];
             _context = context;
 
-            _accessTokenExpiryMinutes = configuration.GetValue<int>("ApiSettings:AccessTokenExpiryMinutes", 60);
+            _accessTokenExpiryMinutes = configuration.GetValue<int>("ApiSettings:AccessTokenExpiryMinutes", 15);
             _refreshTokenExpiryDays = configuration.GetValue<int>("ApiSettings:RefreshTokenExpiryDays", 7);
         }
 

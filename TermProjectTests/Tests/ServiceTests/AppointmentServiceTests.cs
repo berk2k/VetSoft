@@ -10,6 +10,7 @@ using TermProjectBackend.Models.Dto;
 using TermProjectBackend.Source.Svc;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework.Legacy;
+using TermProjectBackend.Source.Svc.Interfaces;
 
 namespace TermProjectTests.Tests.ServiceTests
 {

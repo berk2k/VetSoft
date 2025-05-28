@@ -4,7 +4,7 @@ using System.Net;
 using System.Security.Claims;
 using TermProjectBackend.Models;
 using TermProjectBackend.Models.Dto;
-using TermProjectBackend.Source.Svc;
+using TermProjectBackend.Source.Svc.Interfaces;
 
 namespace TermProjectBackend.Controllers
 {
