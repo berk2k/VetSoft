@@ -90,16 +90,11 @@ Once deployed:
 
 ## 📌 Future Enhancements
 
-- iOS support for pet owners
 - Payment integration (Stripe or PayPal)
 - Real-time video consultation module
-- Role-based access control (RBAC)
+- IOS app for pet owners 
 
 ---
 
-📢 **Contributions welcome!**  
-Whether you're a vet-tech enthusiast or a developer passionate about animal healthcare, feel free to fork and enhance the system.
-
----
 
 🐶🐱 **Making veterinary care simpler, smarter, and more accessible—one paw at a time.**
