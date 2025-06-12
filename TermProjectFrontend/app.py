@@ -55,6 +55,10 @@ def login():
         return jsonify({'error': 'Invalid credentials'}), 401  # Unauthorized status code
     return render_template('login.html')
 """
+@app.route('/get_token')
+def get_token():
+    token = session.get('token')
+    return jsonify({'token': token})
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -76,7 +80,7 @@ def login():
             session['user_role'] = user_data['role']
             
             session['token'] = data['token']
-            session['refreshToken'] = data['refreshToken']
+            #session['refreshToken'] = data['refreshToken']
             return redirect(url_for('home'))
         else:
             return jsonify({'error': 'Invalid username or password'}), 401

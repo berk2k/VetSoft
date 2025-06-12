@@ -60,8 +60,8 @@ namespace TermProjectBackend.Controllers
             return Ok(new
             {
                 token = loginResponse.Token,
-                refreshToken = loginResponse.RefreshToken,
-                expiresAt = loginResponse.RefreshTokenExpiryDate,
+                //refreshToken = loginResponse.RefreshToken,
+                //expiresAt = loginResponse.RefreshTokenExpiryDate,
                 user = loginResponse.APIUser
             });
         }

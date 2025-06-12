@@ -51,13 +51,13 @@ namespace TermProjectBackend.Source.Svc
             _logger.LogInformation("Login successful for user {Email} (ID: {Id})", user.Email, user.Id);
 
             var tokenString = _tokenService.GenerateToken(user.Id, user.Email);
-            var refreshTokenResponse = await _tokenService.CreateRefreshTokenAsync(user.Id);
+            //var refreshTokenResponse = await _tokenService.CreateRefreshTokenAsync(user.Id);
 
             return new LoginResponseVetStaffDTO
             {
                 Token = tokenString,
-                RefreshToken = refreshTokenResponse.RefreshToken,
-                RefreshTokenExpiryDate = refreshTokenResponse.ExpiryDate,
+                //RefreshToken = refreshTokenResponse.RefreshToken,
+                //RefreshTokenExpiryDate = refreshTokenResponse.ExpiryDate,
                 APIUser = SanitizeUser(user)
             };
         }
@@ -67,7 +67,7 @@ namespace TermProjectBackend.Source.Svc
             return new LoginResponseVetStaffDTO
             {
                 Token = "",
-                RefreshToken = "",
+                //RefreshToken = "",
                 APIUser = null,
             };
         }

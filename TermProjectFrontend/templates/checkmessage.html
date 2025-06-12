@@ -192,108 +192,161 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
 
     <script>
-        const baseURL = 'https://termprojectbackend.azurewebsites.net/api/';
+    const baseURL = 'https://localhost:7001/api/';
 
-        // Function to populate the sent messages table
-        function populateSentMessages(userId) {
-            const sentMessagesTable = $('#sentMessagesTable');
-            sentMessagesTable.empty(); // Clear previous table data
-            fetch(baseURL + `Notification/GetNotificationHistoryForUserWOPagination?userId=${userId}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch sent messages');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    data.forEach(notification => {
-                        // Create table row for each notification
-                        const row = $('<tr>');
-                        // Convert ISO date string to a readable format
-                        const sentAt = new Date(notification.sentAt).toLocaleString();
-                        console.log("sentAt",sentAt);
-                        row.append($('<td>').text(notification.message)); // Add message column
-                        row.append($('<td>').text(sentAt)); // Add sentAt column
-                        sentMessagesTable.append(row); // Append row to table
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching sent messages:', error);
-                });
-        }
-
-        // Function to fetch and populate received messages
-        function populateReceivedMessages(userId) {
-            fetch(baseURL + `Notification/GetNotificationHistoryForVet?userId=${userId}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch received messages');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const receivedMessagesTable = $('#receivedMessagesTable');
-                    receivedMessagesTable.empty(); // Clear existing rows
-                    data.forEach(message => {
-                        // Ensure that 'message' object has the correct properties
-                        // Convert ISO date string to a readable format
-                        const sentAt = new Date(message.sentAt).toLocaleString();
-                        receivedMessagesTable.append('<tr><td>' + message.messageTitle + '</td><td>' + message.messageText + '</td><td>' + sentAt + '</td></tr>');
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching received messages:', error);
-                });
-        }
-
-
-
-        $(document).ready(function () {
-            // Fetch user data from Flask backend
-            $.get('/get_users', function (data) {
-                // Populate the select element with the retrieved user data
-                var select = $('#customerSelect');
-                $.each(data, function (index, user) {
-                    select.append('<option value="' + user + '">' + user + '</option>');
-                });
+    // GLOBAL: Kullanıcı adından ID alma fonksiyonu
+    function getUserIdByUserName(username) {
+        return fetch(baseURL + `UserProfile/GetUserIdByUserName?userName=${username}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to get user ID');
+                }
+                return response.json();
             });
+    }
 
-            // Function to get user ID by username
-            function getUserIdByUserName(username) {
-                return fetch(baseURL + `UserProfile/GetUserIdByUserName?userName=${username}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Failed to get user ID');
-                        }
-                        return response.json();
-                    });
-            }
+    // SignalR bağlantısını başlat
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("https://localhost:7001/notificationHub")
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
 
-            // Event listener for form submission
-            $('#messageForm').submit(function (event) {
-                event.preventDefault(); // Prevent default form submission
-                const selectedUser = $('#customerSelect').val(); // Get selected user
-                // Get user ID by username
-                getUserIdByUserName(selectedUser)
-                    .then(userId => {
-                        // Populate sent and received messages tables with the corresponding user ID
-                        populateSentMessages(userId);
-                        populateReceivedMessages(userId);
-                    })
-                    .catch(error => {
-                        console.error('Error getting user ID:', error);
-                    });
+    connection.start()
+        .then(() => {
+            console.log("SignalR connected successfully");
+        })
+        .catch(err => {
+            console.error("SignalR connection error: ", err);
+        });
+
+    // Gelen mesajları dinle
+    connection.on("ReceiveNotification", function (data) {
+    console.log("Yeni mesaj alındı:", data);
+
+        const notificationArea = document.getElementById("notificationArea");
+        if (notificationArea) {
+            const messageText = `${data.userName}: ${data.messageTitle || data.message} (${new Date(data.sentAt).toLocaleString()})`;
+            notificationArea.innerText += messageText + "\n";
+            notificationArea.scrollTop = notificationArea.scrollHeight;
+        }
+
+        const selectedUser = $('#customerSelect').val();
+         if (selectedUser && data.userName === selectedUser) {
+            addReceivedMessageToTable(data);
+            getUserIdByUserName(selectedUser)
+                .then(userId => {
+                    populateSentMessages(userId);
+                    
+                });
+        }
+    });
+
+    // Bağlantı kesilirse yeniden bağlan
+    connection.onclose(async () => {
+        console.log("SignalR connection closed. Attempting to reconnect...");
+        await start();
+    });
+
+    async function start() {
+        try {
+            await connection.start();
+            console.log("SignalR Connected.");
+        } catch (err) {
+            console.log(err);
+            setTimeout(start, 5000);
+        }
+    }
+
+    // Kullanıcıya ait gönderilen bildirimleri tabloya doldur
+    function populateSentMessages(userId) {
+        const sentMessagesTable = $('#sentMessagesTable');
+        sentMessagesTable.empty();
+
+        fetch(baseURL + `Notification/GetNotificationHistoryForUserWOPagination?userId=${userId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch sent messages');
+                }
+                return response.json();
+            })
+            .then(data => {
+                data.forEach(notification => {
+                    const row = $('<tr>');
+                    const sentAt = new Date(notification.sentAt).toLocaleString();
+                    row.append($('<td>').text(notification.message));
+                    row.append($('<td>').text(sentAt));
+                    sentMessagesTable.append(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching sent messages:', error);
+            });
+    }
+
+    
+    function populateReceivedMessages(userId) {
+        fetch(baseURL + `Notification/GetNotificationHistoryForVet?userId=${userId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch received messages');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const receivedMessagesTable = $('#receivedMessagesTable');
+                receivedMessagesTable.empty();
+
+                data.forEach(message => {
+                    const sentAt = new Date(message.sentAt).toLocaleString();
+                    receivedMessagesTable.append('<tr><td>' + message.messageTitle + '</td><td>' + message.messageText + '</td><td>' + sentAt + '</td></tr>');
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching received messages:', error);
+            });
+    }
+
+    function addReceivedMessageToTable(message) {
+        const receivedMessagesTable = $('#receivedMessagesTable');
+        const sentAt = new Date(message.sentAt).toLocaleString();
+        receivedMessagesTable.append('<tr><td>' + (message.messageTitle || '') + '</td><td>' + (message.messageText || message.message || '') + '</td><td>' + sentAt + '</td></tr>');
+    }
+
+
+    // DOM yüklendiğinde çalışacak kod
+    $(document).ready(function () {
+        // Kullanıcı listesini çek
+        $.get('/get_users', function (data) {
+            const select = $('#customerSelect');
+            $.each(data, function (index, user) {
+                select.append('<option value="' + user + '">' + user + '</option>');
             });
         });
 
+        // Form gönderildiğinde tabloyu güncelle
+        $('#messageForm').submit(function (event) {
+            event.preventDefault();
+            const selectedUser = $('#customerSelect').val();
+            getUserIdByUserName(selectedUser)
+                .then(userId => {
+                    populateSentMessages(userId);
+                    populateReceivedMessages(userId);
+                })
+                .catch(error => {
+                    console.error('Error getting user ID:', error);
+                });
+        });
+    });
+</script>
 
-    </script>
 </body>
 
 </html>

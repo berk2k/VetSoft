@@ -13,7 +13,7 @@ namespace TermProjectBackend.Source.Svc.Interfaces
         public List<Notification> GetUserNotificationWOPagination(int userId);
         public string getName(int id);
 
-        public void SendMessageToVet(VetMessageDTO vetMessageDTO);
+        public Task SendMessageToVet(VetMessageDTO vetMessageDTO);
 
         public List<VeterinarianMessages> GetVeterinarianMessages(int userId);
     }

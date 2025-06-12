@@ -81,14 +81,13 @@ namespace TermProjectBackend.Source.Svc
                 .ToList();
         }
 
-        public void SendMessageToVet(VetMessageDTO vetMessageDTO)
+        public async Task SendMessageToVet(VetMessageDTO vetMessageDTO)
         {
             DateTime utcNow = DateTime.UtcNow;
             TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time");
             DateTime trTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tzi);
 
             var user = _vetDb.Users.Find(vetMessageDTO.userId);
-
             if (user == null)
             {
                 throw new InvalidOperationException($"User with ID {vetMessageDTO.userId} not found.");
@@ -106,14 +105,15 @@ namespace TermProjectBackend.Source.Svc
             _vetDb.VeterinarianMessages.Add(newMessage);
             _vetDb.SaveChanges();
 
-            
-            _hubContext.Clients.User(vetMessageDTO.userId.ToString())
-                .SendAsync("ReceiveVetMessage", new
+
+            await _hubContext.Clients.Group("VetStaff")
+                .SendAsync("ReceiveNotification", new
                 {
                     messageTitle = newMessage.MessageTitle,
                     messageText = newMessage.MessageText,
                     userName = newMessage.UserName,
-                    sentAt = newMessage.SentAt
+                    sentAt = newMessage.SentAt,
+                    userId = newMessage.UserId
                 });
         }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TermProjectBackend.Models;
 using TermProjectBackend.Models.Dto;
@@ -22,7 +23,7 @@ namespace TermProjectBackend.Controllers
         // [Authorize]
         public ActionResult Send([FromBody] NotificationRequestDTO notificationRequest)
         {
-            
+
             try
             {
                 _notificationService.Notification(notificationRequest);
@@ -43,14 +44,14 @@ namespace TermProjectBackend.Controllers
                 // Handle other exceptions
                 return StatusCode(500, new { Message = "An error occurred while sending message." });
             }
-            
+
         }
 
         [HttpPost("SendMessageFromUserToVet")]
         // [Authorize]
         public ActionResult SendMessageToVet([FromBody] VetMessageDTO notificationRequest)
         {
-            
+
 
             try
             {
