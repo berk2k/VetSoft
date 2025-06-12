@@ -42,7 +42,7 @@ A **modern, cloud-based web and mobile application** designed to revolutionize t
   Instantly notify pet owners about critical events and schedules.
 
 - **💬 Direct Messaging**  
-  Secure communication channel between vet and pet owner.
+  Secure communication channel between vet and pet owner using SignalR.
 
 - **📦 Stock Management**  
   Monitor inventory levels and receive alerts for restocking.
