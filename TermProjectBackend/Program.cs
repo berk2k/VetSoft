@@ -1,5 +1,6 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -8,6 +9,7 @@ using Serilog.Formatting.Compact;
 using System.Text;
 using TermProjectBackend.Context;
 using TermProjectBackend.Controllers;
+using TermProjectBackend.Hubs;
 using TermProjectBackend.Source.Svc;
 using TermProjectBackend.Source.Svc.Interfaces;
 
@@ -37,12 +39,11 @@ builder.Logging.AddFilter("System", LogLevel.Warning);
 builder.Logging.AddFilter("TermProjectBackend.Source.Svc", LogLevel.Debug);
 
 // Add services to the container.
-
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 builder.Services.AddControllers();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPetService, PetService>();
-//builder.Services.AddScoped<LoginController>();
-//builder.Services.AddScoped<AddPetController>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IVetStaffService, VetStaffService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
@@ -51,6 +52,8 @@ builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IVaccinationService, VaccinationService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+
 
 
 // CORS configuration
@@ -135,6 +138,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
+
+app.MapHub<NotificationHub>("/notificationHub");
 //app.UseSwagger();
 //app.UseSwaggerUI(options =>
 //{

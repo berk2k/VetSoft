@@ -4,22 +4,21 @@ using TermProjectBackend.Models;
 using System.Text;
 using RabbitMQ.Client;
 using TermProjectBackend.Source.Svc.Interfaces;
+using Microsoft.AspNetCore.SignalR;
+using TermProjectBackend.Hubs;
 
 namespace TermProjectBackend.Source.Svc
 {
     public class NotificationService : INotificationService
     {
         private readonly VetDbContext _vetDb;
-        private readonly ConnectionFactory _connectionFactory;
-        private const string QueueName = "notification_queue";
+        private readonly IHubContext<NotificationHub> _hubContext;
 
 
-        public NotificationService(VetDbContext vetDb)
+        public NotificationService(VetDbContext vetDb, IHubContext<NotificationHub> hubContext)
         {
-
             _vetDb = vetDb;
-
-            
+            _hubContext = hubContext;
         }
         public string getName(int userId)
         {
@@ -48,10 +47,9 @@ namespace TermProjectBackend.Source.Svc
 
             if (user == null)
             {
-                
                 throw new InvalidOperationException($"User with ID {notificationRequest.userId} not found.");
             }
-            
+
             Notification newNotification = new Notification
             {
                 message = notificationRequest.message,
@@ -60,14 +58,19 @@ namespace TermProjectBackend.Source.Svc
                 SentAt = trTime
             };
 
-           
             _vetDb.Notification.Add(newNotification);
-
-            
             _vetDb.SaveChanges();
 
-
+            
+            _hubContext.Clients.User(notificationRequest.userId.ToString())
+                .SendAsync("ReceiveNotification", new
+                {
+                    newNotification.message,
+                    sentAt = newNotification.SentAt,
+                    newNotification.userName
+                });
         }
+
 
         public List<Notification> GetUserNotification(int page, int pageSize, int userId)
         {
@@ -81,18 +84,17 @@ namespace TermProjectBackend.Source.Svc
         public void SendMessageToVet(VetMessageDTO vetMessageDTO)
         {
             DateTime utcNow = DateTime.UtcNow;
-            TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time"); 
+            TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time");
             DateTime trTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tzi);
 
             var user = _vetDb.Users.Find(vetMessageDTO.userId);
 
             if (user == null)
             {
-                
                 throw new InvalidOperationException($"User with ID {vetMessageDTO.userId} not found.");
             }
 
-            VeterinarianMessages newNotification = new VeterinarianMessages
+            VeterinarianMessages newMessage = new VeterinarianMessages
             {
                 MessageText = vetMessageDTO.messageText,
                 MessageTitle = vetMessageDTO.messageTitle,
@@ -101,14 +103,20 @@ namespace TermProjectBackend.Source.Svc
                 SentAt = trTime
             };
 
-            
-            _vetDb.VeterinarianMessages.Add(newNotification);
-
-            
+            _vetDb.VeterinarianMessages.Add(newMessage);
             _vetDb.SaveChanges();
 
-
+            
+            _hubContext.Clients.User(vetMessageDTO.userId.ToString())
+                .SendAsync("ReceiveVetMessage", new
+                {
+                    messageTitle = newMessage.MessageTitle,
+                    messageText = newMessage.MessageText,
+                    userName = newMessage.UserName,
+                    sentAt = newMessage.SentAt
+                });
         }
+
 
         public List<Notification> GetUserNotificationWOPagination(int userId)
         {

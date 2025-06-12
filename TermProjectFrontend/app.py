@@ -9,8 +9,8 @@ CORS(app, resources={r"/api/*": {"origins": ["http://127.0.0.1:5000", "http://ve
 
 #CORS(app, resources={r"/api/*": {"origins": "https://vetsoft.pythonanywhere.com/"}})
 
-#baseURL = 'https://localhost:7001/api/'
-baseURL = 'https://termprojectbackend.azurewebsites.net/api/'
+baseURL = 'https://localhost:7001/api/'
+#baseURL = 'https://termprojectbackend.azurewebsites.net/api/'
 
 @app.route('/api/proxy', methods=['GET', 'POST'])
 def proxy():
@@ -61,34 +61,25 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        api_url = baseURL+'Login/LoginForStaff'
         payload = {'email': email, 'password': password}
-        #response = requests.get('https://localhost:7001/api/Login/LoginForStaff', verify=False)
         try:
-            response = requests.post(baseURL + 'Login/LoginForStaff', verify=False, json=payload)
-    # Process response...
-        except requests.exceptions.ProxyError as e:
-            print("Proxy Error:", e)
-    # Handle proxy error...
+            response = requests.post(baseURL + 'Login/Staff', json=payload, verify=False)
         except requests.exceptions.RequestException as e:
             print("Request Exception:", e)
-    # Handle other request exceptions...
-        if response.status_code == 200:
-            user_data = response.json()['result']['apiUser']
-            user_id = user_data['id']
-            user_name = user_data['name']
-            user_role = user_data['role']
-
-            print(str(user_data))
-            session['user_id'] = user_id
-            #session['user_info'] = user_data
-            session['user_name'] = user_name
-            session['user_role'] = user_role
-
-            return redirect(url_for('home'))
+            return jsonify({'error': 'Service unavailable'}), 503
         
-        return jsonify({'error': 'Invalid credentials'}), 401 
-    
+        if response.status_code == 200:
+            data = response.json()
+            user_data = data['user']
+            session['user_id'] = user_data['id']
+            session['user_name'] = user_data['name']
+            session['user_role'] = user_data['role']
+            
+            session['token'] = data['token']
+            session['refreshToken'] = data['refreshToken']
+            return redirect(url_for('home'))
+        else:
+            return jsonify({'error': 'Invalid username or password'}), 401
     return render_template('login.html')
 
 @app.route('/get_users',methods=['GET', 'POST'])
