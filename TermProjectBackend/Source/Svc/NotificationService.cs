@@ -13,20 +13,12 @@ namespace TermProjectBackend.Source.Svc
         private readonly ConnectionFactory _connectionFactory;
         private const string QueueName = "notification_queue";
 
-        //private readonly RabbitMqService _rabbitMqService;
-        public NotificationService(VetDbContext vetDb/*,RabbitMqService rabbitMqService*/)
+
+        public NotificationService(VetDbContext vetDb)
         {
 
             _vetDb = vetDb;
-            //_rabbitMqService = rabbitMqService;
 
-            //_connectionFactory = new ConnectionFactory
-            //{
-            //    HostName = "localhost", // RabbitMQ sunucu adresi
-            //    Port = 5672, // RabbitMQ varsayılan bağlantı noktası
-            //    UserName = "guest", // RabbitMQ kullanıcı adı
-            //    Password = "guest" // RabbitMQ şifre
-            //};
             
         }
         public string getName(int userId)
@@ -39,9 +31,9 @@ namespace TermProjectBackend.Source.Svc
             }
             else
             {
-                // Handle case where user is not found
-                return null; // Or throw an exception, return a default value, etc.
-                return null; // Or throw an exception, return a default value, etc.
+               
+                return "user not found";
+                
             }
         }
 
@@ -49,17 +41,17 @@ namespace TermProjectBackend.Source.Svc
         public void Notification(NotificationRequestDTO notificationRequest)
         {
             DateTime utcNow = DateTime.UtcNow;
-            TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time"); // Türkiye'nin standart saat dilimi
+            TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time");
             DateTime trTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tzi);
 
             var user = _vetDb.Users.Find(notificationRequest.userId);
 
             if (user == null)
             {
-                // Handle the case where the user is not found
+                
                 throw new InvalidOperationException($"User with ID {notificationRequest.userId} not found.");
             }
-            // Create a new Notification instance
+            
             Notification newNotification = new Notification
             {
                 message = notificationRequest.message,
@@ -68,51 +60,14 @@ namespace TermProjectBackend.Source.Svc
                 SentAt = trTime
             };
 
-            // Add the new notification to the Notifications DbSet
+           
             _vetDb.Notification.Add(newNotification);
 
-            // Save changes to the database
+            
             _vetDb.SaveChanges();
 
-            //send message to rabbitmq
-            //SendMessageToRabbitMQ(newNotification);
+
         }
-
-
-        //private void SendMessageToRabbitMQ(Notification newNotification)
-        //{
-            
-        //    using (var connection = _connectionFactory.CreateConnection())
-        //    using (var channel = connection.CreateModel())
-        //    {
-                
-        //        channel.QueueDeclare(queue: QueueName,
-        //                             durable: false,
-        //                             exclusive: false,
-        //                             autoDelete: false,
-        //                             arguments: null);
-
-        //        channel.ExchangeDeclare("direct_exchange", ExchangeType.Fanout, true);
-
-                
-        //        string message = Newtonsoft.Json.JsonConvert.SerializeObject(newNotification);
-        //        var body = Encoding.UTF8.GetBytes(message);
-
-               
-
-
-
-                
-        //        channel.BasicPublish(exchange: "direct_exchange",
-        //                             routingKey: QueueName,
-        //                             basicProperties: null,
-        //                             body: body);
-        //        channel.Close();
-        //        connection.Close();
-        //    }
-        //}
-
-
 
         public List<Notification> GetUserNotification(int page, int pageSize, int userId)
         {
@@ -126,14 +81,14 @@ namespace TermProjectBackend.Source.Svc
         public void SendMessageToVet(VetMessageDTO vetMessageDTO)
         {
             DateTime utcNow = DateTime.UtcNow;
-            TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time"); // Türkiye'nin standart saat dilimi
+            TimeZoneInfo tzi = TimeZoneInfo.FindSystemTimeZoneById("Turkey Standard Time"); 
             DateTime trTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, tzi);
 
             var user = _vetDb.Users.Find(vetMessageDTO.userId);
 
             if (user == null)
             {
-                // Handle the case where the user is not found
+                
                 throw new InvalidOperationException($"User with ID {vetMessageDTO.userId} not found.");
             }
 
@@ -146,14 +101,12 @@ namespace TermProjectBackend.Source.Svc
                 SentAt = trTime
             };
 
-            // Add the new notification to the Notifications DbSet
+            
             _vetDb.VeterinarianMessages.Add(newNotification);
 
-            // Save changes to the database
+            
             _vetDb.SaveChanges();
 
-            //string message = Newtonsoft.Json.JsonConvert.SerializeObject(newNotification);
-            //_rabbitMqService.SendMessageToRabbitMQ(QueueName, message);
 
         }
 
