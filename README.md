@@ -61,7 +61,7 @@ A **modern, cloud-based web and mobile application** designed to revolutionize t
 | **Database** | MSSQL              |
 | **Mobile**   | Kotlin (Android)   |
 | **Cloud**    | Microsoft Azure    |
-| **Messaging**| RabbitMQ           |
+| **Messaging**| SignalR           |
 | **API**      | RESTful            |
 | **Testing**  | Unit Tests, Postman |
 | **Logging**  | Serilog, Seq       |
