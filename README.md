@@ -9,7 +9,7 @@ A **modern, cloud-based web and mobile application** designed to revolutionize t
 - 📱 Mobile App for Pet Owners (Android - Kotlin)
 - 🌐 Web Portal for Veterinarians
 - ☁️ Azure Cloud-hosted Infrastructure
-- 🔄 Real-time Communication via RabbitMQ
+- 🔄 Real-time Communication via SignalR
 - 🧪 Tested with Unit Tests and Postman Collections
 
 ---
